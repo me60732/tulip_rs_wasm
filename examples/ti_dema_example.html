@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>DEMA — tulip-rs-wasm example</title>
+        <style>
+            body {
+                font-family: monospace;
+                padding: 1rem;
+                background: #fafafa;
+                color: #222;
+            }
+            h1 {
+                font-size: 1.1rem;
+                margin: 0 0 0.25rem;
+            }
+            p {
+                color: #666;
+                margin: 0 0 1rem;
+                font-size: 0.85rem;
+            }
+            pre {
+                background: #f0f0f0;
+                padding: 1rem;
+                border-radius: 4px;
+                white-space: pre-wrap;
+                word-break: break-all;
+                line-height: 1.5;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>DEMA — Double Exponential Moving Average</h1>
+        <p>
+            Build:
+            <code
+                >wasm-pack build --target web --out-dir pkg &amp;&amp; npx
+                tsc</code
+            >, then serve this directory and open in a browser.
+        </p>
+        <pre id="out">Loading…</pre>
+        <script type="module">
+            import { init, dema } from "../index.js";
+
+            const lines = [];
+            function log(msg = "") {
+                console.log(msg);
+                lines.push(String(msg));
+                document.getElementById("out").textContent = lines.join("\n");
+            }
+
+            try {
+                await init();
+
+                const close = [
+                    81.59, 81.06, 82.87, 83.0, 83.61, 83.15, 82.84, 83.99,
+                    84.55, 84.36, 85.53, 86.54, 86.89, 87.77, 87.29,
+                ];
+                const options = [5.0];
+
+                const partialClose = close.slice(0, -5);
+                const restClose = close.slice(-5);
+
+                // Info
+                const info = dema.info;
+                log(`=== ${info.name.toUpperCase()} (${info.fullName}) ===`);
+                log(`Type:    ${info.indicatorType}`);
+                log(`Inputs:  ${info.inputs.join(", ")}`);
+                log(
+                    `Options: ${info.options.length > 0 ? info.options.join(", ") + " (current: " + JSON.stringify(options) + ")" : "none"}`,
+                );
+                log(`Outputs: ${info.outputs.join(", ")}`);
+                if (info.optionalOutputs && info.optionalOutputs.length > 0)
+                    log(`Optional: ${info.optionalOutputs.join(", ")}`);
+                log(`Min data:          ${dema.minData(options)}`);
+                log(`Min data (6 d.p.): ${dema.minDataAccuracy(options, 6)}`);
+                log();
+
+                // Full calculation
+                const [outputs] = dema.indicator([close], options);
+                info.outputs.forEach((n, i) =>
+                    log(`Full ${n}: ${Array.from(outputs[i])}`),
+                );
+
+                // Partial → get state
+                const [outputs2, state] = dema.indicator(
+                    [partialClose],
+                    options,
+                );
+                log();
+                info.outputs.forEach((n, i) =>
+                    log(`Partial ${n}: ${Array.from(outputs2[i])}`),
+                );
+
+                // Serialise state
+                const json = state.toJson();
+                log(`\n--- State serialisation ---`);
+                log(`toJson()    → ${json}`);
+
+                // Continue with original state
+                const cont = state.batchIndicator([restClose]);
+                log(`\nContinued (+${restClose.length} bars):`);
+                info.outputs.forEach((n, i) =>
+                    log(`  ${n}: ${Array.from(cont[i])}`),
+                );
+
+                // Restore from JSON → continue
+                const fromJson = dema.State.fromJson(json);
+                const contJson = fromJson.batchIndicator([restClose]);
+                log(`fromJson()   continued:`);
+                info.outputs.forEach((n, i) =>
+                    log(`  ${n}: ${Array.from(contJson[i])}`),
+                );
+
+                log(
+                    `\nData split: ${partialClose.length} + ${restClose.length} = ${close.length} total bars`,
+                );
+            } catch (err) {
+                log(`ERROR: ${err}`);
+                console.error(err);
+            }
+        </script>
+    </body>
+</html>

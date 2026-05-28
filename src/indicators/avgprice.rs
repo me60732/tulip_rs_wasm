@@ -1,0 +1,95 @@
+use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
+use tulip_rs::indicator_types::TIndicatorState as _;
+use tulip_rs::indicators::avgprice as rust_avgprice;
+use wasm_bindgen::prelude::*;
+
+const IW: usize = rust_avgprice::INPUTS_WIDTH;
+const OW: usize = rust_avgprice::OPTIONS_WIDTH;
+
+// ── State class ──────────────────────────────────────────────────────────────
+
+#[wasm_bindgen]
+pub struct AvgpriceState {
+    inner: rust_avgprice::IndicatorState,
+}
+
+#[wasm_bindgen]
+impl AvgpriceState {
+    /// Continue streaming: feed new bars into an existing state.
+    #[wasm_bindgen(js_name = "batchIndicator")]
+    pub fn batch_indicator(
+        &mut self,
+        inputs: JsValue,
+        optional_outputs: JsValue,
+    ) -> Result<JsValue, JsError> {
+        let inputs = inputs_from_js(inputs)?;
+        let input_arr: [&[f64]; IW] = inputs
+            .iter()
+            .map(|v| v.as_slice())
+            .collect::<Vec<_>>()
+            .try_into()
+            .map_err(|_| JsError::new(&format!("Expected {IW} input series")))?;
+        let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
+        let outputs = self
+            .inner
+            .batch_indicator(&input_arr, opt_outs.as_deref())
+            .map_err(|e| JsError::new(&format!("{e:?}")))?;
+        outputs_to_js(outputs)
+    }
+
+    #[wasm_bindgen(js_name = "toJson")]
+    pub fn to_json(&self) -> Result<String, JsError> {
+        serde_json::to_string(&self.inner).map_err(|e| JsError::new(&e.to_string()))
+    }
+
+    #[wasm_bindgen(js_name = "fromJson")]
+    pub fn from_json(json: String) -> Result<AvgpriceState, JsError> {
+        serde_json::from_str::<rust_avgprice::IndicatorState>(&json)
+            .map(|inner| AvgpriceState { inner })
+            .map_err(|e| JsError::new(&e.to_string()))
+    }
+}
+
+// ── Top-level functions ───────────────────────────────────────────────────────
+
+/// Run the AVGPRICE indicator. Returns `[outputs, state]` as a JS array.
+/// `inputs`: `[[open], [high], [low], [close]]`
+#[wasm_bindgen(js_name = "avgpriceIndicator")]
+pub fn avgprice_indicator(
+    inputs: JsValue,
+    optional_outputs: JsValue,
+) -> Result<js_sys::Array, JsError> {
+    let inputs = inputs_from_js(inputs)?;
+    let input_arr: [&[f64]; IW] = inputs
+        .iter()
+        .map(|v| v.as_slice())
+        .collect::<Vec<_>>()
+        .try_into()
+        .map_err(|_| JsError::new(&format!("Expected {IW} input series")))?;
+    let option_arr: [f64; OW] = [];
+    let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
+    let (outputs, inner) = rust_avgprice::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+        .map_err(|e| JsError::new(&format!("{e:?}")))?;
+    make_pair(
+        outputs_to_js(outputs)?,
+        JsValue::from(AvgpriceState { inner }),
+    )
+}
+
+/// Static metadata for AVGPRICE.
+#[wasm_bindgen(js_name = "avgpriceInfo")]
+pub fn avgprice_info() -> JsValue {
+    info_to_object(rust_avgprice::info())
+}
+
+/// Minimum number of input bars needed to produce at least one output bar.
+#[wasm_bindgen(js_name = "avgpriceMinData")]
+pub fn avgprice_min_data() -> u32 {
+    rust_avgprice::min_data(&[]) as u32
+}
+
+/// Minimum input bars needed to achieve a given decimal accuracy.
+#[wasm_bindgen(js_name = "avgpriceMinDataAccuracy")]
+pub fn avgprice_min_data_accuracy(decimals: u32) -> u32 {
+    rust_avgprice::min_data_accuracy(&[], decimals as usize) as u32
+}

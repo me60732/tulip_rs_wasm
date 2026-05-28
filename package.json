@@ -1,0 +1,36 @@
+{
+  "name": "tulip-rs-wasm",
+  "version": "0.1.0",
+  "description": "WebAssembly bindings for tulip_rs — Technical Analysis Library for browsers",
+  "type": "module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/me60732/tulip-rs-wasm"
+  },
+  "scripts": {
+    "build":          "wasm-pack build --target bundler --out-dir pkg && tsc",
+    "build:web":      "wasm-pack build --target web --out-dir pkg && tsc",
+    "build:debug":    "wasm-pack build --dev --target bundler --out-dir pkg && tsc",
+    "build:wasm":     "wasm-pack build --target bundler --out-dir pkg",
+    "build:wasm:web": "wasm-pack build --target web --out-dir pkg",
+    "build:ts":       "tsc",
+    "test":           "wasm-pack test --headless --chrome"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "wasm-pack": "^0.13"
+  },
+  "files": [
+    "pkg/",
+    "index.js",
+    "index.d.ts",
+    "src-ts/indicator.js",
+    "src-ts/indicator.d.ts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

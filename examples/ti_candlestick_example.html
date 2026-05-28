@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>CANDLESTICK — tulip-rs-wasm example</title>
+        <style>
+            body {
+                font-family: monospace;
+                padding: 1rem;
+                background: #fafafa;
+                color: #222;
+            }
+            h1 {
+                font-size: 1.1rem;
+                margin: 0 0 0.25rem;
+            }
+            p {
+                color: #666;
+                margin: 0 0 1rem;
+                font-size: 0.85rem;
+            }
+            pre {
+                background: #f0f0f0;
+                padding: 1rem;
+                border-radius: 4px;
+                white-space: pre-wrap;
+                word-break: break-all;
+                line-height: 1.5;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>CANDLESTICK — Candlestick Pattern Detector</h1>
+        <p>
+            Build:
+            <code
+                >wasm-pack build --target web --out-dir pkg &amp;&amp; npx
+                tsc</code
+            >, then serve this directory and open in a browser.
+        </p>
+        <pre id="out">Loading…</pre>
+        <script type="module">
+            import { init, candlestick } from "../index.js";
+
+            const lines = [];
+            function log(msg = "") {
+                console.log(msg);
+                lines.push(String(msg));
+                document.getElementById("out").textContent = lines.join("\n");
+            }
+
+            function printBars(result) {
+                result.forEach((entry, i) => {
+                    if (entry && entry.length > 0)
+                        log(
+                            `  bar ${String(i).padStart(2)}: ${entry.map((p) => p.name).join(", ")}`,
+                        );
+                });
+            }
+            function printDetail(patterns) {
+                if (!patterns || patterns.length === 0) {
+                    log("  (none)");
+                    return;
+                }
+                patterns.forEach((p) =>
+                    log(
+                        `  - ${p.fullName} (${p.japaneseName})  bars:${p.bars}  forecast:${p.forecast}`,
+                    ),
+                );
+            }
+
+            try {
+                await init();
+
+                // 19-bar dataset for richer pattern detection
+                const open = [
+                    81.85, 81.2, 81.55, 82.91, 83.1, 83.41, 82.71, 82.7, 84.2,
+                    84.25, 84.03, 85.45, 86.18, 88.0, 87.3, 87.3, 86.4, 84.3,
+                    85.6,
+                ];
+                const high = [
+                    82.15, 81.89, 83.03, 83.3, 83.85, 83.9, 83.33, 84.3, 84.84,
+                    85.0, 85.9, 86.58, 86.98, 88.0, 87.31, 87.3, 86.4, 85.5,
+                    85.65,
+                ];
+                const low = [
+                    81.29, 80.64, 81.31, 82.65, 83.07, 83.11, 82.49, 82.3,
+                    84.15, 84.11, 84.03, 85.39, 85.76, 87.17, 87.2, 86.3, 85.3,
+                    84.0, 83.85,
+                ];
+                const close = [
+                    81.59, 81.06, 82.87, 83.0, 83.61, 83.15, 82.84, 83.99,
+                    84.55, 84.36, 85.53, 86.54, 86.89, 87.77, 87.29, 86.3, 85.3,
+                    84.0, 83.9,
+                ];
+                const options = [5.0, 1.0, 1.0];
+
+                // Info
+                const info = candlestick.info;
+                log(`=== ${info.name.toUpperCase()} (${info.fullName}) ===`);
+                log(`Type:    ${info.indicatorType}`);
+                log(`Inputs:  ${info.inputs.join(", ")}`);
+                log(
+                    `Options: ${info.options.length > 0 ? info.options.join(", ") + " (current: " + JSON.stringify(options) + ")" : "none"}`,
+                );
+                log(`Outputs: ${info.outputs.join(", ")}`);
+                if (info.optionalOutputs && info.optionalOutputs.length > 0)
+                    log(`Optional: ${info.optionalOutputs.join(", ")}`);
+                log(`Min data: ${candlestick.minData(options)}`);
+                log();
+
+                // --- Run 1: No filter ---
+                log("=== Run 1: No filter ===");
+                const [result1] = candlestick.indicator(
+                    [open, high, low, close],
+                    options,
+                );
+                log("Bar-by-bar hits:");
+                printBars(result1);
+                log("Last bar patterns:");
+                printDetail(result1[result1.length - 1]);
+
+                // --- Run 2: BullishReversal filter ---
+                log("\n=== Run 2: BullishReversal filter ===");
+                const [result2] = candlestick.indicator(
+                    [open, high, low, close],
+                    options,
+                    "BullishReversal",
+                );
+                log("Bar-by-bar hits:");
+                printBars(result2);
+                log("Last bar patterns:");
+                printDetail(result2[result2.length - 1]);
+
+                // --- Run 3: BearishReversal filter ---
+                log("\n=== Run 3: BearishReversal filter ===");
+                const [result3] = candlestick.indicator(
+                    [open, high, low, close],
+                    options,
+                    "BearishReversal",
+                );
+                log("Bar-by-bar hits:");
+                printBars(result3);
+                log("Last bar patterns:");
+                printDetail(result3[result3.length - 1]);
+
+                // --- State serialisation (using state from Run 1) ---
+                const [result, state] = candlestick.indicator(
+                    [open, high, low, close],
+                    options,
+                );
+                const json = state.toJson();
+                log("\n--- State serialisation ---");
+                log(`toJson()    → ${json}`);
+
+                // Stream one new bar
+                const newBar = [[83.5], [84.0], [83.0], [83.8]];
+                const streamed = state.batchIndicator(newBar);
+                log("\nStreamed new bar (original state):");
+                printDetail(streamed[0]);
+
+                // Restore from JSON
+                const fromJson = candlestick.State.fromJson(json);
+                const streamedJson = fromJson.batchIndicator(newBar);
+                log("fromJson() streamed:");
+                printDetail(streamedJson[0]);
+            } catch (err) {
+                log(`ERROR: ${err}`);
+                console.error(err);
+            }
+        </script>
+    </body>
+</html>

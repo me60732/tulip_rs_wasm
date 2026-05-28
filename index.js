@@ -67,9 +67,10 @@ let _initialised = false;
  *                  `await init(new URL('./pkg/tulip_rs_wasm_bg.wasm', import.meta.url))`.
  */
 export async function init(wasmPath) {
-  if (_initialised) return;
-  await initWasm(wasmPath);
-  _initialised = true;
+    if (_initialised)
+        return;
+    await initWasm(wasmPath);
+    _initialised = true;
 }
 // ── Internal wasm module reference ───────────────────────────────────────────
 // `wasmExports` is the live namespace imported from the wasm-pack generated

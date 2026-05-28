@@ -15,14 +15,14 @@
  */
 /** Indicator metadata — shape identical to tulip-rs-node's `IndicatorInfo`. */
 export interface IndicatorInfo {
-  name: string;
-  fullName: string;
-  inputs: string[];
-  options: string[];
-  outputs: string[];
-  optionalOutputs: string[];
-  indicatorType: string;
-  displayType: string;
+    name: string;
+    fullName: string;
+    inputs: string[];
+    options: string[];
+    outputs: string[];
+    optionalOutputs: string[];
+    indicatorType: string;
+    displayType: string;
 }
 type AnyWasm = Record<string, any>;
 /**
@@ -34,41 +34,37 @@ type AnyWasm = Record<string, any>;
  * been run.
  */
 export declare class Indicator<S = unknown> {
-  private readonly _name;
-  private readonly _wasm;
-  private _info;
-  constructor(name: string, wasm: AnyWasm);
-  /**
-   * Static metadata — fetched lazily on first access after WASM is initialised.
-   * Shape is identical to `tulip-rs-node`.
-   */
-  get info(): IndicatorInfo;
-  /**
-   * Run the indicator on a batch of data.
-   * Returns `[outputs, state]` where `outputs` is an array of `Float64Array`
-   * series (one per output channel) and `state` is the streaming state object.
-   *
-   * Identical call signature to `tulip-rs-node`.
-   */
-  indicator(
-    inputs: number[][],
-    options: number[],
-    optionalOutputs?: boolean[],
-  ): [Float64Array[], S];
-  /**
-   * Minimum number of input bars required to produce at least one output bar.
-   * Identical call signature to `tulip-rs-node`.
-   */
-  minData(options: number[]): number;
-  /**
-   * Minimum input bars needed to achieve a given decimal accuracy.
-   * Identical call signature to `tulip-rs-node`.
-   */
-  minDataAccuracy(options: number[], decimals: number): number;
-  /**
-   * The wasm-bindgen State class for this indicator.
-   * Use `sma.State.fromJson(json)` to restore a previously serialised state.
-   */
-  get State(): any;
+    private readonly _name;
+    private readonly _wasm;
+    private _info;
+    constructor(name: string, wasm: AnyWasm);
+    /**
+     * Static metadata — fetched lazily on first access after WASM is initialised.
+     * Shape is identical to `tulip-rs-node`.
+     */
+    get info(): IndicatorInfo;
+    /**
+     * Run the indicator on a batch of data.
+     * Returns `[outputs, state]` where `outputs` is an array of `Float64Array`
+     * series (one per output channel) and `state` is the streaming state object.
+     *
+     * Identical call signature to `tulip-rs-node`.
+     */
+    indicator(inputs: number[][], options: number[], optionalOutputs?: boolean[]): [Float64Array[], S];
+    /**
+     * Minimum number of input bars required to produce at least one output bar.
+     * Identical call signature to `tulip-rs-node`.
+     */
+    minData(options: number[]): number;
+    /**
+     * Minimum input bars needed to achieve a given decimal accuracy.
+     * Identical call signature to `tulip-rs-node`.
+     */
+    minDataAccuracy(options: number[], decimals: number): number;
+    /**
+     * The wasm-bindgen State class for this indicator.
+     * Use `sma.State.fromJson(json)` to restore a previously serialised state.
+     */
+    get State(): any;
 }
 export {};

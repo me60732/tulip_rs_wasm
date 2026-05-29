@@ -293,7 +293,7 @@ source = "git+https://github.com/me60732/tulip_rs.git#49d83a750f7a5868f0d0edf78b
 
 [[package]]
 name = "tulip_rs_wasm"
-version = "0.1.1"
+version = "0.1.3"
 dependencies = [
  "js-sys",
  "serde",

@@ -233,12 +233,13 @@ Each pattern object has:
 
 | Category | Indicators |
 |---|---|
-| **Trend** | SMA, EMA, DEMA, TEMA, WMA, HMA, KAMA, TRIMA, ZLEMA, WILDERS, VIDYA, LINREG, TSF |
+| **Trend (Overlay)** | SMA, EMA, DEMA, TEMA, WMA, HMA, KAMA, TRIMA, ZLEMA, WILDERS, VIDYA, LINREG, TSF, PSAR |
 | **Momentum** | RSI, CMO, MOM, ROC, ROCR, STOCH, STOCHRSI, DPO, FOSC, MACD, APO, PPO |
-| **Volatility** | ATR, NATR, VOLATILITY, BBANDS, STDDEV, MD |
+| **Volatility (Overlay)** | BBANDS |
+| **Volatility (Oscillator)** | ATR, NATR, VOLATILITY, STDDEV, MD |
 | **Volume** | OBV, AD, ADOSC, MFI, EMV, NVI, PVI, KVO, VWMA, VOSC |
-| **Directional** | ADX, ADXR, DI, DM, DX, AROON, AROONOSC, PSAR |
-| **Price** | AVGPRICE, MEDPRICE, TYPPRICE, WCPRICE |
+| **Directional** | ADX, ADXR, DI, DM, DX, AROON, AROONOSC |
+| **Price (Overlay)** | AVGPRICE, MEDPRICE, TYPPRICE, WCPRICE |
 | **Other** | AO, BOP, CCI, CVI, FISHER, MASS, MARKETFI, MSW, QSTICK, TR, VHF, WAD, WILLR, PIVOTPOINT, ULTOSC |
 | **Candlestick** | 60+ patterns via `candlestick` |
 

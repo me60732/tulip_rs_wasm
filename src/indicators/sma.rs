@@ -79,7 +79,7 @@ pub fn sma_indicator(
 /// Static metadata for SMA.
 #[wasm_bindgen(js_name = "smaInfo")]
 pub fn sma_info() -> JsValue {
-    info_to_object(rust_sma::info())
+    info_to_object(rust_sma::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

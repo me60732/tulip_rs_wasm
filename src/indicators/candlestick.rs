@@ -145,7 +145,7 @@ pub fn candlestick_indicator(
 /// Static metadata for the candlestick indicator.
 #[wasm_bindgen(js_name = "candlestickInfo")]
 pub fn candlestick_info() -> JsValue {
-    info_to_object(rust_cdl::info())
+    info_to_object(rust_cdl::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

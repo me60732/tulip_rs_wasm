@@ -82,7 +82,7 @@ pub fn fisher_indicator(
 /// Static metadata for Fisher.
 #[wasm_bindgen(js_name = "fisherInfo")]
 pub fn fisher_info() -> JsValue {
-    info_to_object(rust_fisher::info())
+    info_to_object(rust_fisher::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

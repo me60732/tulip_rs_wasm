@@ -79,7 +79,7 @@ pub fn rocr_indicator(
 /// Static metadata for ROCR.
 #[wasm_bindgen(js_name = "rocrInfo")]
 pub fn rocr_info() -> JsValue {
-    info_to_object(rust_rocr::info())
+    info_to_object(rust_rocr::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

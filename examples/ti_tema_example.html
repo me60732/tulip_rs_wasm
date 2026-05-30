@@ -59,8 +59,12 @@
                 ];
                 const options = [5.0];
 
-                const partialClose = close.slice(0, -5);
-                const restClose = close.slice(-5);
+                // TEMA with period=5 needs minData=13.
+                // Cap the split so partialClose always has >= minData bars.
+                const minData = tema.minData(options);
+                const splitPoint = Math.min(5, close.length - minData);
+                const partialClose = close.slice(0, -splitPoint);
+                const restClose = close.slice(-splitPoint);
 
                 const info = tema.info;
                 log(`=== ${info.name.toUpperCase()} (${info.fullName}) ===`);

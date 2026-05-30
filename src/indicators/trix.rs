@@ -79,7 +79,7 @@ pub fn trix_indicator(
 /// Static metadata for TRIX.
 #[wasm_bindgen(js_name = "trixInfo")]
 pub fn trix_info() -> JsValue {
-    info_to_object(rust_trix::info())
+    info_to_object(rust_trix::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

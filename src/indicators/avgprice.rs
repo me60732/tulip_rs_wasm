@@ -82,7 +82,7 @@ pub fn avgprice_indicator(
 /// Static metadata for AVGPRICE.
 #[wasm_bindgen(js_name = "avgpriceInfo")]
 pub fn avgprice_info() -> JsValue {
-    info_to_object(rust_avgprice::info())
+    info_to_object(rust_avgprice::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

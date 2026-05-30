@@ -79,7 +79,7 @@ pub fn roc_indicator(
 /// Static metadata for ROC.
 #[wasm_bindgen(js_name = "rocInfo")]
 pub fn roc_info() -> JsValue {
-    info_to_object(rust_roc::info())
+    info_to_object(rust_roc::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

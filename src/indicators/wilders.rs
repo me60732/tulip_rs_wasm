@@ -82,7 +82,7 @@ pub fn wilders_indicator(
 /// Static metadata for WILDERS.
 #[wasm_bindgen(js_name = "wildersInfo")]
 pub fn wilders_info() -> JsValue {
-    info_to_object(rust_wilders::info())
+    info_to_object(rust_wilders::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

@@ -79,7 +79,7 @@ pub fn psar_indicator(
 /// Static metadata for PSAR.
 #[wasm_bindgen(js_name = "psarInfo")]
 pub fn psar_info() -> JsValue {
-    info_to_object(rust_psar::info())
+    info_to_object(rust_psar::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

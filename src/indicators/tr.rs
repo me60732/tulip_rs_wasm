@@ -75,7 +75,7 @@ pub fn tr_indicator(inputs: JsValue, options: Vec<f64>, optional_outputs: JsValu
 /// Static metadata for TR.
 #[wasm_bindgen(js_name = "trInfo")]
 pub fn tr_info() -> JsValue {
-    info_to_object(rust_tr::info())
+    info_to_object(rust_tr::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

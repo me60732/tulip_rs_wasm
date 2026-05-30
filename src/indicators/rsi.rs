@@ -79,7 +79,7 @@ pub fn rsi_indicator(
 /// Static metadata for RSI.
 #[wasm_bindgen(js_name = "rsiInfo")]
 pub fn rsi_info() -> JsValue {
-    info_to_object(rust_rsi::info())
+    info_to_object(rust_rsi::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

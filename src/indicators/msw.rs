@@ -79,7 +79,7 @@ pub fn msw_indicator(
 /// Static metadata for MSW.
 #[wasm_bindgen(js_name = "mswInfo")]
 pub fn msw_info() -> JsValue {
-    info_to_object(rust_msw::info())
+    info_to_object(rust_msw::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

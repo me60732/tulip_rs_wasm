@@ -82,7 +82,7 @@ pub fn medprice_indicator(
 /// Static metadata for MEDPRICE.
 #[wasm_bindgen(js_name = "medpriceInfo")]
 pub fn medprice_info() -> JsValue {
-    info_to_object(rust_medprice::info())
+    info_to_object(rust_medprice::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

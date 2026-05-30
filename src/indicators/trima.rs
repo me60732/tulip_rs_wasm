@@ -79,7 +79,7 @@ pub fn trima_indicator(
 /// Static metadata for TRIMA.
 #[wasm_bindgen(js_name = "trimaInfo")]
 pub fn trima_info() -> JsValue {
-    info_to_object(rust_trima::info())
+    info_to_object(rust_trima::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

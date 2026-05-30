@@ -82,7 +82,7 @@ pub fn stddev_indicator(
 /// Static metadata for STDDEV.
 #[wasm_bindgen(js_name = "stddevInfo")]
 pub fn stddev_info() -> JsValue {
-    info_to_object(rust_stddev::info())
+    info_to_object(rust_stddev::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

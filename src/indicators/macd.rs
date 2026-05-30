@@ -79,7 +79,7 @@ pub fn macd_indicator(
 /// Static metadata for MACD.
 #[wasm_bindgen(js_name = "macdInfo")]
 pub fn macd_info() -> JsValue {
-    info_to_object(rust_macd::info())
+    info_to_object(rust_macd::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

@@ -79,7 +79,7 @@ pub fn ema_indicator(
 /// Static metadata for EMA.
 #[wasm_bindgen(js_name = "emaInfo")]
 pub fn ema_info() -> JsValue {
-    info_to_object(rust_ema::info())
+    info_to_object(rust_ema::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

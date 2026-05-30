@@ -75,7 +75,7 @@ pub fn pvi_indicator(inputs: JsValue, options: Vec<f64>, optional_outputs: JsVal
 /// Static metadata for PVI.
 #[wasm_bindgen(js_name = "pviInfo")]
 pub fn pvi_info() -> JsValue {
-    info_to_object(rust_pvi::info())
+    info_to_object(rust_pvi::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

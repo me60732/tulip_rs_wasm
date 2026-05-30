@@ -79,7 +79,7 @@ pub fn adosc_indicator(
 /// Static metadata for ADOSC.
 #[wasm_bindgen(js_name = "adoscInfo")]
 pub fn adosc_info() -> JsValue {
-    info_to_object(rust_adosc::info())
+    info_to_object(rust_adosc::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

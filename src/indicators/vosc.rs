@@ -79,7 +79,7 @@ pub fn vosc_indicator(
 /// Static metadata for VOSC.
 #[wasm_bindgen(js_name = "voscInfo")]
 pub fn vosc_info() -> JsValue {
-    info_to_object(rust_vosc::info())
+    info_to_object(rust_vosc::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

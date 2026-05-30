@@ -82,7 +82,7 @@ pub fn ultosc_indicator(
 /// Static metadata for ULTOSC.
 #[wasm_bindgen(js_name = "ultoscInfo")]
 pub fn ultosc_info() -> JsValue {
-    info_to_object(rust_ultosc::info())
+    info_to_object(rust_ultosc::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

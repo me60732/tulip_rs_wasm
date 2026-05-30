@@ -79,7 +79,7 @@ pub fn cmo_indicator(
 /// Static metadata for CMO.
 #[wasm_bindgen(js_name = "cmoInfo")]
 pub fn cmo_info() -> JsValue {
-    info_to_object(rust_cmo::info())
+    info_to_object(rust_cmo::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

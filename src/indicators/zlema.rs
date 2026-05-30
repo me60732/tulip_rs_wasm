@@ -79,7 +79,7 @@ pub fn zlema_indicator(
 /// Static metadata for ZLEMA.
 #[wasm_bindgen(js_name = "zlemaInfo")]
 pub fn zlema_info() -> JsValue {
-    info_to_object(rust_zlema::info())
+    info_to_object(rust_zlema::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

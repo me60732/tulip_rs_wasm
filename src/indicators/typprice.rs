@@ -82,7 +82,7 @@ pub fn typprice_indicator(
 /// Static metadata for TYPPRICE.
 #[wasm_bindgen(js_name = "typpriceInfo")]
 pub fn typprice_info() -> JsValue {
-    info_to_object(rust_typprice::info())
+    info_to_object(rust_typprice::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

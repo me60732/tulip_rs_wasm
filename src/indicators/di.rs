@@ -79,7 +79,7 @@ pub fn di_indicator(
 /// Static metadata for DI.
 #[wasm_bindgen(js_name = "diInfo")]
 pub fn di_info() -> JsValue {
-    info_to_object(rust_di::info())
+    info_to_object(rust_di::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

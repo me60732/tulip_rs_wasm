@@ -53,14 +53,18 @@
             try {
                 await init();
 
-                const high = [
+                // MASS with period=5 needs minData=21 bars.
+                // Double the base 15-bar data to produce 30 bars.
+                const highBase = [
                     82.15, 81.89, 83.03, 83.3, 83.85, 83.9, 83.33, 84.3, 84.84,
                     85.0, 85.9, 86.58, 86.98, 88.0, 87.87,
                 ];
-                const low = [
+                const lowBase = [
                     81.29, 80.64, 81.31, 82.65, 83.07, 83.11, 82.49, 82.3,
                     84.15, 84.11, 84.03, 85.39, 85.76, 87.17, 87.01,
                 ];
+                const high = [...highBase, ...highBase];
+                const low = [...lowBase, ...lowBase];
                 const options = [5.0];
 
                 const partialHigh = high.slice(0, -5);

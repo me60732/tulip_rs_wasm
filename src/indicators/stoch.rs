@@ -79,7 +79,7 @@ pub fn stoch_indicator(
 /// Static metadata for STOCH.
 #[wasm_bindgen(js_name = "stochInfo")]
 pub fn stoch_info() -> JsValue {
-    info_to_object(rust_stoch::info())
+    info_to_object(rust_stoch::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

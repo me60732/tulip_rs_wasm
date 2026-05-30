@@ -75,7 +75,7 @@ pub fn ao_indicator(inputs: JsValue, options: Vec<f64>, optional_outputs: JsValu
 /// Static metadata for AO.
 #[wasm_bindgen(js_name = "aoInfo")]
 pub fn ao_info() -> JsValue {
-    info_to_object(rust_ao::info())
+    info_to_object(rust_ao::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

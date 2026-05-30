@@ -1,6 +1,6 @@
 {
   "name": "tulip-rs-wasm",
-  "version": "0.1.4",
+  "version": "0.1.10",
   "description": "WebAssembly bindings for tulip_rs — Technical Analysis Library for browsers",
   "type": "module",
   "main": "index.js",
@@ -20,6 +20,7 @@
     "test": "wasm-pack test --headless --chrome"
   },
   "devDependencies": {
+    "playwright": "^1.60.0",
     "typescript": "^5",
     "wasm-pack": "^0.13"
   },

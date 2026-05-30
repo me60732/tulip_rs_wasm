@@ -83,7 +83,7 @@ pub fn volatility_indicator(
 /// Static metadata for VOLATILITY.
 #[wasm_bindgen(js_name = "volatilityInfo")]
 pub fn volatility_info() -> JsValue {
-    info_to_object(rust_volatility::info())
+    info_to_object(rust_volatility::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

@@ -79,7 +79,7 @@ pub fn adxr_indicator(
 /// Static metadata for ADXR.
 #[wasm_bindgen(js_name = "adxrInfo")]
 pub fn adxr_info() -> JsValue {
-    info_to_object(rust_adxr::info())
+    info_to_object(rust_adxr::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

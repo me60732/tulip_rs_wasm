@@ -82,7 +82,7 @@ pub fn linreg_indicator(
 /// Static metadata for LINREG.
 #[wasm_bindgen(js_name = "linregInfo")]
 pub fn linreg_info() -> JsValue {
-    info_to_object(rust_linreg::info())
+    info_to_object(rust_linreg::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

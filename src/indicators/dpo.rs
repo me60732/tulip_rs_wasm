@@ -79,7 +79,7 @@ pub fn dpo_indicator(
 /// Static metadata for DPO.
 #[wasm_bindgen(js_name = "dpoInfo")]
 pub fn dpo_info() -> JsValue {
-    info_to_object(rust_dpo::info())
+    info_to_object(rust_dpo::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

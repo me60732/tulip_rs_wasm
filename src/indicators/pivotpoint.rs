@@ -83,7 +83,7 @@ pub fn pivotpoint_indicator(
 /// Static metadata for PivotPoint.
 #[wasm_bindgen(js_name = "pivotpointInfo")]
 pub fn pivotpoint_info() -> JsValue {
-    info_to_object(rust_pivotpoint::info())
+    info_to_object(rust_pivotpoint::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

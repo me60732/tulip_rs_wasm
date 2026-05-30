@@ -59,8 +59,10 @@
                 ];
                 const options = [5.0];
 
-                const partialClose = close.slice(0, -5);
-                const restClose = close.slice(-5);
+                // TRIX with period=5 needs minData=14; only split off 1 bar
+                // so partialClose has exactly 14 bars (the minimum needed).
+                const partialClose = close.slice(0, -1);
+                const restClose = close.slice(-1);
 
                 const info = trix.info;
                 log(`=== ${info.name.toUpperCase()} (${info.fullName}) ===`);

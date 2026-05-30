@@ -75,7 +75,7 @@ pub fn ad_indicator(inputs: JsValue, options: Vec<f64>, optional_outputs: JsValu
 /// Static metadata for AD.
 #[wasm_bindgen(js_name = "adInfo")]
 pub fn ad_info() -> JsValue {
-    info_to_object(rust_ad::info())
+    info_to_object(rust_ad::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

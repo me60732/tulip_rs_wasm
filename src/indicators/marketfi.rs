@@ -82,7 +82,7 @@ pub fn marketfi_indicator(
 /// Static metadata for MARKETFI.
 #[wasm_bindgen(js_name = "marketfiInfo")]
 pub fn marketfi_info() -> JsValue {
-    info_to_object(rust_marketfi::info())
+    info_to_object(rust_marketfi::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

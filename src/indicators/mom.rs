@@ -79,7 +79,7 @@ pub fn mom_indicator(
 /// Static metadata for MOM.
 #[wasm_bindgen(js_name = "momInfo")]
 pub fn mom_info() -> JsValue {
-    info_to_object(rust_mom::info())
+    info_to_object(rust_mom::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

@@ -5,6 +5,19 @@ use wasm_bindgen::prelude::*;
 
 // ── InfoObject ────────────────────────────────────────────────────────────────
 
+/// One entry in the `displayGroups` list of an [`InfoObject`].
+///
+/// Each group describes a set of outputs that belong on the same rendering pane.
+/// Shape is identical to the napi-rs `DisplayGroupObject` in `tulip-rs-node`.
+#[derive(Serialize)]
+pub struct DisplayGroupObject {
+    pub id: String,
+    pub label: String,
+    #[serde(rename = "displayType")]
+    pub display_type: String,
+    pub outputs: Vec<String>,
+}
+
 /// Plain-JS-object shape returned by every `{name}Info()` function.
 /// Serialised to a JS object via serde-wasm-bindgen so the shape is identical
 /// to the napi-rs `InfoObject` produced by `tulip-rs-node`.
@@ -20,14 +33,26 @@ pub struct InfoObject {
     pub optional_outputs: Vec<String>,
     #[serde(rename = "indicatorType")]
     pub indicator_type: String,
-    #[serde(rename = "displayType")]
-    pub display_type: String,
+    /// Groups of outputs that should be rendered together on the same pane.
+    #[serde(rename = "displayGroups")]
+    pub display_groups: Vec<DisplayGroupObject>,
 }
 
 /// Convert a tulip_rs `Info` struct into an `InfoObject` and serialise it as a
 /// plain JS object.  Returns `null` on the (practically impossible) serialisation
 /// failure rather than panicking.
-pub fn info_to_object(info: Info<'static>) -> JsValue {
+pub fn info_to_object(info: Info) -> JsValue {
+    let display_groups = info
+        .display_groups
+        .iter()
+        .map(|g| DisplayGroupObject {
+            id: g.id.to_string(),
+            label: g.label.to_string(),
+            display_type: format!("{:?}", g.display_type),
+            outputs: g.outputs.iter().map(|s| s.to_string()).collect(),
+        })
+        .collect();
+
     let obj = InfoObject {
         name: info.name.to_string(),
         full_name: info.full_name.to_string(),
@@ -40,7 +65,7 @@ pub fn info_to_object(info: Info<'static>) -> JsValue {
             .map(|s| s.to_string())
             .collect(),
         indicator_type: format!("{:?}", info.indicator_type),
-        display_type: format!("{:?}", info.display_type),
+        display_groups,
     };
     serde_wasm_bindgen::to_value(&obj).unwrap_or(JsValue::NULL)
 }

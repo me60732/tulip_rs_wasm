@@ -82,7 +82,7 @@ pub fn aroonosc_indicator(
 /// Static metadata for AROONOSC.
 #[wasm_bindgen(js_name = "aroonoscInfo")]
 pub fn aroonosc_info() -> JsValue {
-    info_to_object(rust_aroonosc::info())
+    info_to_object(rust_aroonosc::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

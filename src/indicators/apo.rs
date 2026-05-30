@@ -79,7 +79,7 @@ pub fn apo_indicator(
 /// Static metadata for APO.
 #[wasm_bindgen(js_name = "apoInfo")]
 pub fn apo_info() -> JsValue {
-    info_to_object(rust_apo::info())
+    info_to_object(rust_apo::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

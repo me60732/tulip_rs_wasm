@@ -82,7 +82,7 @@ pub fn qstick_indicator(
 /// Static metadata for QSTICK.
 #[wasm_bindgen(js_name = "qstickInfo")]
 pub fn qstick_info() -> JsValue {
-    info_to_object(rust_qstick::info())
+    info_to_object(rust_qstick::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

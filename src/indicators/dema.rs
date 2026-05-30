@@ -79,7 +79,7 @@ pub fn dema_indicator(
 /// Static metadata for DEMA.
 #[wasm_bindgen(js_name = "demaInfo")]
 pub fn dema_info() -> JsValue {
-    info_to_object(rust_dema::info())
+    info_to_object(rust_dema::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

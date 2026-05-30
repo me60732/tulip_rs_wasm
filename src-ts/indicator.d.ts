@@ -14,6 +14,17 @@
  *    buffer methods.
  */
 /** Indicator metadata — shape identical to tulip-rs-node's `IndicatorInfo`. */
+export interface DisplayGroup {
+    /** Stable machine-readable key, e.g. `"adx_dx"` or `"true_range"`. */
+    id: string;
+    /** Human-readable pane title, e.g. `"Directional Index"`. */
+    label: string;
+    /** Where to render: `"Overlay"` | `"Indicator"` | `"Volume"`. */
+    displayType: string;
+    /** Output names belonging to this group (may include optional outputs). */
+    outputs: string[];
+}
+/** Indicator metadata — shape identical to tulip-rs-node's `IndicatorInfo`. */
 export interface IndicatorInfo {
     name: string;
     fullName: string;
@@ -22,7 +33,8 @@ export interface IndicatorInfo {
     outputs: string[];
     optionalOutputs: string[];
     indicatorType: string;
-    displayType: string;
+    /** Groups of outputs that should be rendered together on the same pane. */
+    displayGroups: DisplayGroup[];
 }
 type AnyWasm = Record<string, any>;
 /**

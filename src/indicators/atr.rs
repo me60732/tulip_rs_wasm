@@ -79,7 +79,7 @@ pub fn atr_indicator(
 /// Static metadata for ATR.
 #[wasm_bindgen(js_name = "atrInfo")]
 pub fn atr_info() -> JsValue {
-    info_to_object(rust_atr::info())
+    info_to_object(rust_atr::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

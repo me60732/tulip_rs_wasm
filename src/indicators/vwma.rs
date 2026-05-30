@@ -79,7 +79,7 @@ pub fn vwma_indicator(
 /// Static metadata for VWMA.
 #[wasm_bindgen(js_name = "vwmaInfo")]
 pub fn vwma_info() -> JsValue {
-    info_to_object(rust_vwma::info())
+    info_to_object(rust_vwma::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

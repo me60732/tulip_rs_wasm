@@ -82,7 +82,7 @@ pub fn stochrsi_indicator(
 /// Static metadata for STOCHRSI.
 #[wasm_bindgen(js_name = "stochrsiInfo")]
 pub fn stochrsi_info() -> JsValue {
-    info_to_object(rust_stochrsi::info())
+    info_to_object(rust_stochrsi::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

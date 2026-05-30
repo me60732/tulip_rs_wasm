@@ -53,7 +53,7 @@
  */
 import { Indicator } from "./src-ts/indicator.js";
 export { Indicator };
-export type { IndicatorInfo } from "./src-ts/indicator.js";
+export type { IndicatorInfo, DisplayGroup } from "./src-ts/indicator.js";
 /**
  * Load and initialise the WASM module.  Must be awaited once before calling
  * any indicator function or accessing `indicator.info`.

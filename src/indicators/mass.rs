@@ -79,7 +79,7 @@ pub fn mass_indicator(
 /// Static metadata for MASS.
 #[wasm_bindgen(js_name = "massInfo")]
 pub fn mass_info() -> JsValue {
-    info_to_object(rust_mass::info())
+    info_to_object(rust_mass::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

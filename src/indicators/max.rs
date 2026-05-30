@@ -79,7 +79,7 @@ pub fn max_indicator(
 /// Static metadata for MAX.
 #[wasm_bindgen(js_name = "maxInfo")]
 pub fn max_info() -> JsValue {
-    info_to_object(rust_max::info())
+    info_to_object(rust_max::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

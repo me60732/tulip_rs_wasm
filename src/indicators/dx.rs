@@ -79,7 +79,7 @@ pub fn dx_indicator(
 /// Static metadata for DX.
 #[wasm_bindgen(js_name = "dxInfo")]
 pub fn dx_info() -> JsValue {
-    info_to_object(rust_dx::info())
+    info_to_object(rust_dx::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

@@ -79,7 +79,7 @@ pub fn tsf_indicator(
 /// Static metadata for TSF.
 #[wasm_bindgen(js_name = "tsfInfo")]
 pub fn tsf_info() -> JsValue {
-    info_to_object(rust_tsf::info())
+    info_to_object(rust_tsf::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

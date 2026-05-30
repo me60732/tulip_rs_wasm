@@ -79,7 +79,7 @@ pub fn cvi_indicator(
 /// Static metadata for CVI.
 #[wasm_bindgen(js_name = "cviInfo")]
 pub fn cvi_info() -> JsValue {
-    info_to_object(rust_cvi::info())
+    info_to_object(rust_cvi::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

@@ -79,7 +79,7 @@ pub fn min_indicator(
 /// Static metadata for MIN.
 #[wasm_bindgen(js_name = "minInfo")]
 pub fn min_info() -> JsValue {
-    info_to_object(rust_min::info())
+    info_to_object(rust_min::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

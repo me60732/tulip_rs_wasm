@@ -82,7 +82,7 @@ pub fn bbands_indicator(
 /// Static metadata for BBANDS.
 #[wasm_bindgen(js_name = "bbandsInfo")]
 pub fn bbands_info() -> JsValue {
-    info_to_object(rust_bbands::info())
+    info_to_object(rust_bbands::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

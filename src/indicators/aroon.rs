@@ -79,7 +79,7 @@ pub fn aroon_indicator(
 /// Static metadata for AROON.
 #[wasm_bindgen(js_name = "aroonInfo")]
 pub fn aroon_info() -> JsValue {
-    info_to_object(rust_aroon::info())
+    info_to_object(rust_aroon::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

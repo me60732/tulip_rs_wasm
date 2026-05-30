@@ -79,7 +79,7 @@ pub fn kvo_indicator(
 /// Static metadata for KVO.
 #[wasm_bindgen(js_name = "kvoInfo")]
 pub fn kvo_info() -> JsValue {
-    info_to_object(rust_kvo::info())
+    info_to_object(rust_kvo::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

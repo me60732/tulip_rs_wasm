@@ -79,7 +79,7 @@ pub fn hma_indicator(
 /// Static metadata for HMA.
 #[wasm_bindgen(js_name = "hmaInfo")]
 pub fn hma_info() -> JsValue {
-    info_to_object(rust_hma::info())
+    info_to_object(rust_hma::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

@@ -75,7 +75,7 @@ pub fn bop_indicator(inputs: JsValue, options: Vec<f64>, optional_outputs: JsVal
 /// Static metadata for BOP.
 #[wasm_bindgen(js_name = "bopInfo")]
 pub fn bop_info() -> JsValue {
-    info_to_object(rust_bop::info())
+    info_to_object(rust_bop::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

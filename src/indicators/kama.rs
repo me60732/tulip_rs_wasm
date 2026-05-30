@@ -79,7 +79,7 @@ pub fn kama_indicator(
 /// Static metadata for KAMA.
 #[wasm_bindgen(js_name = "kamaInfo")]
 pub fn kama_info() -> JsValue {
-    info_to_object(rust_kama::info())
+    info_to_object(rust_kama::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

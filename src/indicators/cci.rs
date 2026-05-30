@@ -79,7 +79,7 @@ pub fn cci_indicator(
 /// Static metadata for CCI.
 #[wasm_bindgen(js_name = "cciInfo")]
 pub fn cci_info() -> JsValue {
-    info_to_object(rust_cci::info())
+    info_to_object(rust_cci::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

@@ -79,7 +79,7 @@ pub fn mfi_indicator(
 /// Static metadata for MFI.
 #[wasm_bindgen(js_name = "mfiInfo")]
 pub fn mfi_info() -> JsValue {
-    info_to_object(rust_mfi::info())
+    info_to_object(rust_mfi::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

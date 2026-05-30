@@ -79,7 +79,7 @@ pub fn dm_indicator(
 /// Static metadata for DM.
 #[wasm_bindgen(js_name = "dmInfo")]
 pub fn dm_info() -> JsValue {
-    info_to_object(rust_dm::info())
+    info_to_object(rust_dm::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

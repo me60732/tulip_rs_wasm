@@ -82,7 +82,7 @@ pub fn wcprice_indicator(
 /// Static metadata for WCPRICE.
 #[wasm_bindgen(js_name = "wcpriceInfo")]
 pub fn wcprice_info() -> JsValue {
-    info_to_object(rust_wcprice::info())
+    info_to_object(rust_wcprice::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.

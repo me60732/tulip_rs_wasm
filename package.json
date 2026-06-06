@@ -22,7 +22,7 @@
   "devDependencies": {
     "playwright": "1.60.0",
     "typescript": "5.9.3",
-    "wasm-pack": "0.13.1"
+    "wasm-pack": "0.15.0"
   },
   "files": [
     "pkg/tulip_rs_wasm_bg.wasm",

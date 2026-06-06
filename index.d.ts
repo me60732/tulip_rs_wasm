@@ -89,6 +89,7 @@ export declare const donchianchannel: Indicator<unknown>;
 export declare const dpo: Indicator<unknown>;
 export declare const dx: Indicator<unknown>;
 export declare const ef: Indicator<unknown>;
+export declare const elderray: Indicator<unknown>;
 export declare const ema: Indicator<unknown>;
 export declare const emv: Indicator<unknown>;
 export declare const fisher: Indicator<unknown>;

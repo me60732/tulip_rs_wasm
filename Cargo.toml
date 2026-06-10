@@ -1,6 +1,6 @@
 [package]
 name = "tulip_rs_wasm"
-version = "0.1.11"
+version = "0.1.13"
 edition = "2021"
 description = "WebAssembly bindings for tulip_rs — Technical Analysis Library for browsers"
 license = "MIT"
@@ -15,8 +15,7 @@ js-sys        = "0.3"
 serde         = { version = "1", features = ["derive"] }
 serde_json    = "1"
 serde-wasm-bindgen = "0.6"
-# When publishing, pin to a release tag: { git = "...", tag = "v0.1.11" }
-tulip_rs      = { git = "https://github.com/me60732/tulip_rs.git", default-features = false }
+tulip_rs      = { git = "https://github.com/me60732/tulip_rs.git", tag = "v0.1.13", default-features = false }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"

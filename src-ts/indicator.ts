@@ -79,7 +79,7 @@ export class Indicator<S = unknown> {
    * Identical call signature to `tulip-rs-node`.
    */
   indicator(
-    inputs: number[][],
+    inputs: (number[] | Float64Array)[],
     options: number[],
     optionalOutputs?: boolean[],
   ): [Float64Array[], S] {

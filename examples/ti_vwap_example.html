@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>VWAP — tulip-rs-wasm example</title>
+        <style>
+            body {
+                font-family: monospace;
+                padding: 1rem;
+                background: #fafafa;
+                color: #222;
+            }
+            h1 {
+                font-size: 1.1rem;
+                margin: 0 0 0.25rem;
+            }
+            p {
+                color: #666;
+                margin: 0 0 1rem;
+                font-size: 0.85rem;
+            }
+            pre {
+                background: #f0f0f0;
+                padding: 1rem;
+                border-radius: 4px;
+                white-space: pre-wrap;
+                word-break: break-all;
+                line-height: 1.5;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>VWAP — Volume Weighted Average Price</h1>
+        <p>
+            Build:
+            <code
+                >wasm-pack build --target web --out-dir pkg &amp;&amp; npx
+                tsc</code
+            >, then serve this directory and open in a browser.
+        </p>
+        <pre id="out">Loading…</pre>
+        <script type="module">
+            import { init, vwap } from "../index.js";
+
+            const lines = [];
+            function log(msg = "") {
+                console.log(msg);
+                lines.push(String(msg));
+                document.getElementById("out").textContent = lines.join("\n");
+            }
+
+            try {
+                await init();
+
+                const high = [
+                    82.15, 81.89, 83.03, 83.30, 83.85, 83.90, 83.33, 84.30, 84.84, 85.00,
+                    85.90, 86.58, 86.98, 88.00, 87.87, 88.20, 88.70, 89.10, 88.50, 89.00,
+                    89.60, 89.90, 89.30, 90.10, 90.50, 91.00, 90.30, 91.00, 91.60, 92.00,
+                    91.30, 92.00, 92.60, 93.00, 92.30, 93.00, 93.60, 94.00, 93.30, 94.10,
+                ];
+                const low = [
+                    81.29, 80.64, 81.31, 82.65, 83.07, 83.11, 82.49, 82.30, 84.15, 84.11,
+                    84.03, 85.39, 85.76, 87.17, 87.01, 87.20, 87.80, 88.20, 87.60, 88.00,
+                    88.60, 88.90, 88.30, 89.00, 89.40, 89.80, 89.20, 89.90, 90.50, 90.80,
+                    90.20, 90.90, 91.50, 91.80, 91.20, 91.90, 92.50, 92.80, 92.20, 92.90,
+                ];
+                const close = [
+                    81.59, 81.06, 82.87, 83.00, 83.61, 83.15, 82.84, 83.99, 84.55, 84.36,
+                    85.53, 86.54, 86.89, 87.77, 87.29, 87.50, 88.10, 88.50, 87.90, 88.20,
+                    88.80, 89.10, 88.70, 89.30, 89.70, 90.10, 89.50, 90.20, 90.80, 91.10,
+                    90.50, 91.20, 91.80, 92.10, 91.50, 92.20, 92.80, 93.10, 92.50, 93.20,
+                ];
+                const volume = [
+                    5653100, 6447400, 7690900, 3831400, 4455100, 3798000, 3936200, 4732000,
+                    4841300, 3915300, 6830800, 6694100, 5293600, 7985800, 4807900, 5100000,
+                    5300000, 4900000, 5200000, 4800000, 5600000, 5800000, 5400000, 6000000,
+                    6200000, 5800000, 6400000, 6600000, 6200000, 6800000, 7000000, 6600000,
+                    7200000, 7400000, 7000000, 7600000, 7800000, 7400000, 8000000, 8200000,
+                ];
+                const options = [];
+
+                const partialHigh = high.slice(0, -5);
+                const partialLow = low.slice(0, -5);
+                const partialClose = close.slice(0, -5);
+                const partialVolume = volume.slice(0, -5);
+                const restHigh = high.slice(-5);
+                const restLow = low.slice(-5);
+                const restClose = close.slice(-5);
+                const restVolume = volume.slice(-5);
+
+                const info = vwap.info;
+                log(`=== ${info.name.toUpperCase()} (${info.fullName}) ===`);
+                log(`Type:    ${info.indicatorType}`);
+                log(`Inputs:  ${info.inputs.join(", ")}`);
+                log(
+                    `Options: ${info.options.length > 0 ? info.options.join(", ") + " (current: " + JSON.stringify(options) + ")" : "none"}`,
+                );
+                log(`Outputs: ${info.outputs.join(", ")}`);
+                if (info.optionalOutputs && info.optionalOutputs.length > 0)
+                    log(`Optional: ${info.optionalOutputs.join(", ")}`);
+                log(`Min data:          ${vwap.minData(options)}`);
+                log();
+
+                // Full calculation with optional typprice output
+                const [outputs] = vwap.indicator(
+                    [high, low, close, volume],
+                    options,
+                    [true],
+                );
+                info.outputs.forEach((n, i) =>
+                    log(`Full ${n}: ${Array.from(outputs[i])}`),
+                );
+                info.optionalOutputs.forEach((n, i) =>
+                    log(`Full ${n} (optional): ${Array.from(outputs[info.outputs.length + i])}`),
+                );
+
+                // Partial run
+                const [outputs2, state] = vwap.indicator(
+                    [partialHigh, partialLow, partialClose, partialVolume],
+                    options,
+                    [true],
+                );
+                log();
+                info.outputs.forEach((n, i) =>
+                    log(`Partial ${n}: ${Array.from(outputs2[i])}`),
+                );
+                info.optionalOutputs.forEach((n, i) =>
+                    log(`Partial ${n} (optional): ${Array.from(outputs2[info.outputs.length + i])}`),
+                );
+
+                // Serialise state
+                const json = state.toJson();
+                log(`\n--- State serialisation ---`);
+                log(`toJson()    \u2192 ${json}`);
+
+                // Continue with original state
+                const cont = state.batchIndicator(
+                    [restHigh, restLow, restClose, restVolume],
+                    [true],
+                );
+                log(`\nContinued (+${restHigh.length} bars):`);
+                info.outputs.forEach((n, i) =>
+                    log(`  ${n}: ${Array.from(cont[i])}`),
+                );
+                info.optionalOutputs.forEach((n, i) =>
+                    log(`  ${n} (optional): ${Array.from(cont[info.outputs.length + i])}`),
+                );
+
+                // Restore from JSON \u2192 continue
+                const fromJson = vwap.State.fromJson(json);
+                const contJson = fromJson.batchIndicator(
+                    [restHigh, restLow, restClose, restVolume],
+                    [true],
+                );
+                log(`fromJson()   continued:`);
+                info.outputs.forEach((n, i) =>
+                    log(`  ${n}: ${Array.from(contJson[i])}`),
+                );
+                info.optionalOutputs.forEach((n, i) =>
+                    log(`  ${n} (optional): ${Array.from(contJson[info.outputs.length + i])}`),
+                );
+
+                log(
+                    `\nData split: ${partialHigh.length} + ${restHigh.length} = ${high.length} total bars`,
+                );
+            } catch (err) {
+                log(`ERROR: ${err}`);
+                console.error(err);
+            }
+        </script>
+    </body>
+</html>

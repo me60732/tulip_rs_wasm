@@ -20,10 +20,16 @@ export interface DisplayGroup {
   id: string;
   /** Human-readable pane title, e.g. `"Directional Index"`. */
   label: string;
-  /** Where to render: `"Overlay"` | `"Indicator"` | `"Volume"`. */
+  /** Where to render: `"Overlay"` | `"Indicator"` | `"Volume"` | `"Price"`. */
   displayType: string;
   /** Output names belonging to this group (may include optional outputs). */
   outputs: string[];
+  /**
+   * Optional time-shift for this group's outputs, expressed as a signed
+   * option reference (e.g. `"+long_period"` or `"-long_period"`).
+   * `null` / `undefined` means no shift.
+   */
+  offset?: string | null;
 }
 
 /** Indicator metadata — shape identical to tulip-rs-node's `IndicatorInfo`. */

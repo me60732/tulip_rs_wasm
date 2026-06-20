@@ -55,14 +55,13 @@ import { Indicator } from "./src-ts/indicator.js";
 export { Indicator };
 export type { IndicatorInfo, DisplayGroup } from "./src-ts/indicator.js";
 /**
- * Load and initialise the WASM module.  Must be awaited once before calling
- * any indicator function or accessing `indicator.info`.
+ * Load and compile the WebAssembly module.  Must be `await`-ed once before
+ * calling any indicator function.
  *
- * @param wasmPath  Optional URL / path to the `.wasm` file.  When omitted the
- *                  bundler (Vite, webpack, etc.) resolves the asset
- *                  automatically.  For plain `<script type="module">` usage
- *                  pass the URL explicitly, e.g.
- *                  `await init(new URL('./pkg/tulip_rs_wasm_bg.wasm', import.meta.url))`.
+ * @param wasmPath  Optional explicit URL for the `.wasm` binary.  Defaults to
+ *                  `./pkg/tulip_rs_wasm_bg.wasm` relative to `index.js`.
+ *                  Pass an absolute URL when serving from a CDN, e.g.:
+ *                  `await init('https://cdn.example.com/tulip_rs_wasm_bg.wasm')`
  */
 export declare function init(wasmPath?: string | URL | Request): Promise<void>;
 export declare const ad: Indicator<unknown>;
@@ -146,3 +145,17 @@ export declare const wilders: Indicator<unknown>;
 export declare const willr: Indicator<unknown>;
 export declare const wma: Indicator<unknown>;
 export declare const zlema: Indicator<unknown>;
+export declare const adaptivemsw: Indicator<unknown>;
+export declare const ccfisher: Indicator<unknown>;
+export declare const cybercycle: Indicator<unknown>;
+export declare const highpass: Indicator<unknown>;
+export declare const hilberttransform: Indicator<unknown>;
+export declare const homodynediscriminator: Indicator<unknown>;
+export declare const ichimoku: Indicator<unknown>;
+export declare const instantaneoustrendline: Indicator<unknown>;
+export declare const mama: Indicator<unknown>;
+export declare const roofingfilter: Indicator<unknown>;
+export declare const supersmoother: Indicator<unknown>;
+export declare const supertrend: Indicator<unknown>;
+export declare const trendmode: Indicator<unknown>;
+export declare const vwap: Indicator<unknown>;

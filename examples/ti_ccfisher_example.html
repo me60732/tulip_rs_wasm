@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>CCFISHER — tulip-rs-wasm example</title>
+        <style>
+            body {
+                font-family: monospace;
+                padding: 1rem;
+                background: #fafafa;
+                color: #222;
+            }
+            h1 {
+                font-size: 1.1rem;
+                margin: 0 0 0.25rem;
+            }
+            p {
+                color: #666;
+                margin: 0 0 1rem;
+                font-size: 0.85rem;
+            }
+            pre {
+                background: #f0f0f0;
+                padding: 1rem;
+                border-radius: 4px;
+                white-space: pre-wrap;
+                word-break: break-all;
+                line-height: 1.5;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>CCFISHER — Cyber Cycle Fisher</h1>
+        <p>
+            Build:
+            <code
+                >wasm-pack build --target web --out-dir pkg &amp;&amp; npx
+                tsc</code
+            >, then serve this directory and open in a browser.
+        </p>
+        <pre id="out">Loading&#x2026;</pre>
+        <script type="module">
+            import { init, ccfisher } from "../index.js";
+
+            const lines = [];
+            function log(msg = "") {
+                console.log(msg);
+                lines.push(String(msg));
+                document.getElementById("out").textContent = lines.join("\n");
+            }
+
+            try {
+                await init();
+
+                const close = [
+                    81.59, 81.06, 82.87, 83.00, 83.61, 83.15, 82.84, 83.99, 84.55, 84.36,
+                    85.53, 86.54, 86.89, 87.77, 87.29, 87.50, 88.10, 88.50, 87.90, 88.20,
+                    88.80, 89.10, 88.70, 89.30, 89.70, 90.10, 89.50, 90.20, 90.80, 91.10,
+                    90.50, 91.20, 91.80, 92.10, 91.50, 92.20, 92.80, 93.10, 92.50, 93.20,
+                ];
+                const close80 = [
+                    ...close,
+                    93.80, 94.10, 93.50, 94.20, 94.80, 95.10, 94.50, 95.20, 95.80, 96.10,
+                    95.50, 96.20, 96.80, 97.10, 96.50, 97.20, 97.80, 98.10, 97.50, 98.20,
+                    98.80, 99.10, 98.50, 99.20, 99.80, 100.10, 99.50, 100.20, 100.80, 101.10,
+                    100.50, 101.20, 101.80, 102.10, 101.50, 102.20, 102.80, 103.10, 102.50, 103.20,
+                ];
+                const options = [0.0];
+
+                const partialClose = close80.slice(0, -10);
+                const restClose = close80.slice(-10);
+
+                const info = ccfisher.info;
+                log(`=== ${info.name.toUpperCase()} (${info.fullName}) ===`);
+                log(`Type:    ${info.indicatorType}`);
+                log(`Inputs:  ${info.inputs.join(", ")}`);
+                log(
+                    `Options: ${info.options.length > 0 ? info.options.join(", ") + " (current: " + JSON.stringify(options) + ")" : "none"}`,
+                );
+                log(`Outputs: ${info.outputs.join(", ")}`);
+                if (info.optionalOutputs && info.optionalOutputs.length > 0)
+                    log(`Optional: ${info.optionalOutputs.join(", ")}`);
+                log(`Min data:          ${ccfisher.minData(options)}`);
+                log();
+
+                // Full calculation with all optional outputs
+                const [outputs] = ccfisher.indicator([close80], options, [true, true, true]);
+                info.outputs.forEach((n, i) =>
+                    log(`Full ${n}: ${Array.from(outputs[i])}`),
+                );
+                info.optionalOutputs.forEach((n, i) =>
+                    log(`Full ${n} (optional): ${Array.from(outputs[info.outputs.length + i])}`),
+                );
+
+                // Partial run
+                const [outputs2, state] = ccfisher.indicator(
+                    [partialClose],
+                    options,
+                    [true, true, true],
+                );
+                log();
+                info.outputs.forEach((n, i) =>
+                    log(`Partial ${n}: ${Array.from(outputs2[i])}`),
+                );
+                info.optionalOutputs.forEach((n, i) =>
+                    log(`Partial ${n} (optional): ${Array.from(outputs2[info.outputs.length + i])}`),
+                );
+
+                // Serialise state
+                const json = state.toJson();
+                log(`\n--- State serialisation ---`);
+                log(`toJson()    \u2192 ${json}`);
+
+                // Continue with original state
+                const cont = state.batchIndicator([restClose], [true, true, true]);
+                log(`\nContinued (+${restClose.length} bars):`);
+                info.outputs.forEach((n, i) =>
+                    log(`  ${n}: ${Array.from(cont[i])}`),
+                );
+                info.optionalOutputs.forEach((n, i) =>
+                    log(`  ${n} (optional): ${Array.from(cont[info.outputs.length + i])}`),
+                );
+
+                // Restore from JSON \u2192 continue
+                const fromJson = ccfisher.State.fromJson(json);
+                const contJson = fromJson.batchIndicator([restClose], [true, true, true]);
+                log(`fromJson()   continued:`);
+                info.outputs.forEach((n, i) =>
+                    log(`  ${n}: ${Array.from(contJson[i])}`),
+                );
+                info.optionalOutputs.forEach((n, i) =>
+                    log(`  ${n} (optional): ${Array.from(contJson[info.outputs.length + i])}`),
+                );
+
+                log(
+                    `\nData split: ${partialClose.length} + ${restClose.length} = ${close80.length} total bars`,
+                );
+            } catch (err) {
+                log(`ERROR: ${err}`);
+                console.error(err);
+            }
+        </script>
+    </body>
+</html>

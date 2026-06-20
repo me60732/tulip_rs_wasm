@@ -16,6 +16,7 @@ pub struct DisplayGroupObject {
     #[serde(rename = "displayType")]
     pub display_type: String,
     pub outputs: Vec<String>,
+    pub offset: Option<String>,
 }
 
 /// Plain-JS-object shape returned by every `{name}Info()` function.
@@ -50,6 +51,7 @@ pub fn info_to_object(info: Info) -> JsValue {
             label: g.label.to_string(),
             display_type: format!("{:?}", g.display_type),
             outputs: g.outputs.iter().map(|s| s.to_string()).collect(),
+            offset: g.offset.map(|s| s.to_string()),
         })
         .collect();
 

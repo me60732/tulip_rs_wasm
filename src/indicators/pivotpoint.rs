@@ -92,10 +92,5 @@ pub fn pivotpoint_min_data(options: Vec<f64>) -> u32 {
     rust_pivotpoint::min_data(&options) as u32
 }
 
-/// Minimum input bars needed to achieve a given decimal accuracy.
-#[wasm_bindgen(js_name = "pivotpointMinDataAccuracy")]
-pub fn pivotpoint_min_data_accuracy(options: Vec<f64>, decimals: u32) -> u32 {
-    rust_pivotpoint::min_data_accuracy(&options, decimals as usize) as u32
-}
 
 // Note: SIMD variants are not available for this indicator.

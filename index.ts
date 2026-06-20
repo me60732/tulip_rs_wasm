@@ -52,7 +52,10 @@
  *   npm run build:web       →  both in one step
  */
 
-import initWasm, * as wasmExports from "./pkg/tulip_rs_wasm.js";
+// Web target: wasm-pack generates a module with an async default-export init
+// function and named exports for every indicator function.  We must call
+// init() once (with the .wasm URL) before any indicator is used.
+import * as wasmExports from "./pkg/tulip_rs_wasm.js";
 
 import { Indicator } from "./src-ts/indicator.js";
 
@@ -61,22 +64,24 @@ export type { IndicatorInfo, DisplayGroup } from "./src-ts/indicator.js";
 
 // ── Initialisation ────────────────────────────────────────────────────────────
 
-let _initialised = false;
-
 /**
- * Load and initialise the WASM module.  Must be awaited once before calling
- * any indicator function or accessing `indicator.info`.
+ * Load and compile the WebAssembly module.  Must be `await`-ed once before
+ * calling any indicator function.
  *
- * @param wasmPath  Optional URL / path to the `.wasm` file.  When omitted the
- *                  bundler (Vite, webpack, etc.) resolves the asset
- *                  automatically.  For plain `<script type="module">` usage
- *                  pass the URL explicitly, e.g.
- *                  `await init(new URL('./pkg/tulip_rs_wasm_bg.wasm', import.meta.url))`.
+ * @param wasmPath  Optional explicit URL for the `.wasm` binary.  Defaults to
+ *                  `./pkg/tulip_rs_wasm_bg.wasm` relative to `index.js`.
+ *                  Pass an absolute URL when serving from a CDN, e.g.:
+ *                  `await init('https://cdn.example.com/tulip_rs_wasm_bg.wasm')`
  */
 export async function init(wasmPath?: string | URL | Request): Promise<void> {
-  if (_initialised) return;
-  await initWasm(wasmPath);
-  _initialised = true;
+  const url: string | URL | Request =
+    wasmPath ?? new URL("./pkg/tulip_rs_wasm_bg.wasm", import.meta.url);
+  // The web-target build exports init as the default export of the pkg module.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const wasmInit = (wasmExports as any).default;
+  if (typeof wasmInit === "function") {
+    await wasmInit(url);
+  }
 }
 
 // ── Internal wasm module reference ───────────────────────────────────────────
@@ -167,3 +172,23 @@ export const wilders = new Indicator("wilders", _wasm);
 export const willr = new Indicator("willr", _wasm);
 export const wma = new Indicator("wma", _wasm);
 export const zlema = new Indicator("zlema", _wasm);
+export const adaptivemsw = new Indicator("adaptivemsw", _wasm);
+export const ccfisher = new Indicator("ccfisher", _wasm);
+export const cybercycle = new Indicator("cybercycle", _wasm);
+export const highpass = new Indicator("highpass", _wasm);
+export const hilberttransform = new Indicator("hilberttransform", _wasm);
+export const homodynediscriminator = new Indicator(
+  "homodynediscriminator",
+  _wasm,
+);
+export const ichimoku = new Indicator("ichimoku", _wasm);
+export const instantaneoustrendline = new Indicator(
+  "instantaneoustrendline",
+  _wasm,
+);
+export const mama = new Indicator("mama", _wasm);
+export const roofingfilter = new Indicator("roofingfilter", _wasm);
+export const supersmoother = new Indicator("supersmoother", _wasm);
+export const supertrend = new Indicator("supertrend", _wasm);
+export const trendmode = new Indicator("trendmode", _wasm);
+export const vwap = new Indicator("vwap", _wasm);

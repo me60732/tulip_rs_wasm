@@ -1,16 +1,17 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
 use tulip_rs::indicators::adxr as rust_adxr;
+use tulip_rs::indicators::adxr::{Adxr, Indicator, IndicatorState, INPUTS, OPTIONS};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_adxr::INPUTS_WIDTH;
-const OW: usize = rust_adxr::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct AdxrState {
-    inner: rust_adxr::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
@@ -71,7 +72,7 @@ pub fn adxr_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_adxr::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = Adxr::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(outputs_to_js(outputs)?, JsValue::from(AdxrState { inner }))
 }
@@ -79,12 +80,14 @@ pub fn adxr_indicator(
 /// Static metadata for ADXR.
 #[wasm_bindgen(js_name = "adxrInfo")]
 pub fn adxr_info() -> JsValue {
-    info_to_object(rust_adxr::INFO)
+    info_to_object(Adxr::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "adxrMinData")]
 pub fn adxr_min_data(options: Vec<f64>) -> u32 {
-    rust_adxr::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    Adxr::min_data(&option_arr) as u32
 }
-

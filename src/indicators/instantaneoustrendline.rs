@@ -1,16 +1,19 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
 use tulip_rs::indicators::instantaneoustrendline as rust_instantaneoustrendline;
+use tulip_rs::indicators::instantaneoustrendline::{
+    Indicator, IndicatorState, InstantaneousTrendline, INPUTS, OPTIONS,
+};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_instantaneoustrendline::INPUTS_WIDTH;
-const OW: usize = rust_instantaneoustrendline::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct InstantaneoustrendlineState {
-    inner: rust_instantaneoustrendline::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
@@ -72,7 +75,7 @@ pub fn instantaneoustrendline_indicator(
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
     let (outputs, inner) =
-        rust_instantaneoustrendline::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+        InstantaneousTrendline::indicator(&input_arr, &option_arr, opt_outs.as_deref())
             .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(
         outputs_to_js(outputs)?,
@@ -83,12 +86,14 @@ pub fn instantaneoustrendline_indicator(
 /// Static metadata for Instantaneous Trendline.
 #[wasm_bindgen(js_name = "instantaneoustrendlineInfo")]
 pub fn instantaneoustrendline_info() -> JsValue {
-    info_to_object(rust_instantaneoustrendline::INFO)
+    info_to_object(InstantaneousTrendline::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "instantaneoustrendlineMinData")]
 pub fn instantaneoustrendline_min_data(options: Vec<f64>) -> u32 {
-    rust_instantaneoustrendline::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    InstantaneousTrendline::min_data(&option_arr) as u32
 }
-

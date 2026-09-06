@@ -1,16 +1,17 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
 use tulip_rs::indicators::bbands as rust_bbands;
+use tulip_rs::indicators::bbands::{BBands, Indicator, IndicatorState, INPUTS, OPTIONS};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_bbands::INPUTS_WIDTH;
-const OW: usize = rust_bbands::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct BbandsState {
-    inner: rust_bbands::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
@@ -71,7 +72,7 @@ pub fn bbands_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_bbands::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = BBands::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(
         outputs_to_js(outputs)?,
@@ -82,12 +83,14 @@ pub fn bbands_indicator(
 /// Static metadata for BBANDS.
 #[wasm_bindgen(js_name = "bbandsInfo")]
 pub fn bbands_info() -> JsValue {
-    info_to_object(rust_bbands::INFO)
+    info_to_object(BBands::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "bbandsMinData")]
 pub fn bbands_min_data(options: Vec<f64>) -> u32 {
-    rust_bbands::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    BBands::min_data(&option_arr) as u32
 }
-

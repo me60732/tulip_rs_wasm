@@ -1,16 +1,18 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
-use tulip_rs::indicators::roofingfilter as rust_roofingfilter;
+use tulip_rs::indicators::roofingfilter::{
+    Indicator, IndicatorState, RoofingFilter, INPUTS, OPTIONS,
+};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_roofingfilter::INPUTS_WIDTH;
-const OW: usize = rust_roofingfilter::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct RoofingfilterState {
-    inner: rust_roofingfilter::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
@@ -44,7 +46,7 @@ impl RoofingfilterState {
 
     #[wasm_bindgen(js_name = "fromJson")]
     pub fn from_json(json: String) -> Result<RoofingfilterState, JsError> {
-        serde_json::from_str::<rust_roofingfilter::IndicatorState>(&json)
+        serde_json::from_str::<IndicatorState>(&json)
             .map(|inner| RoofingfilterState { inner })
             .map_err(|e| JsError::new(&e.to_string()))
     }
@@ -72,9 +74,8 @@ pub fn roofingfilter_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) =
-        rust_roofingfilter::indicator(&input_arr, &option_arr, opt_outs.as_deref())
-            .map_err(|e| JsError::new(&format!("{e:?}")))?;
+    let (outputs, inner) = RoofingFilter::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+        .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(
         outputs_to_js(outputs)?,
         JsValue::from(RoofingfilterState { inner }),
@@ -84,12 +85,14 @@ pub fn roofingfilter_indicator(
 /// Static metadata for Ehlers Roofing Filter.
 #[wasm_bindgen(js_name = "roofingfilterInfo")]
 pub fn roofingfilter_info() -> JsValue {
-    info_to_object(rust_roofingfilter::INFO)
+    info_to_object(RoofingFilter::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "roofingfilterMinData")]
 pub fn roofingfilter_min_data(options: Vec<f64>) -> u32 {
-    rust_roofingfilter::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    RoofingFilter::min_data(&option_arr) as u32
 }
-

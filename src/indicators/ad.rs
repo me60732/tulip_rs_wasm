@@ -1,16 +1,17 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
 use tulip_rs::indicators::ad as rust_ad;
+use tulip_rs::indicators::ad::{Ad, Indicator, IndicatorState, INPUTS, OPTIONS};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_ad::INPUTS_WIDTH;
-const OW: usize = rust_ad::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct AdState {
-    inner: rust_ad::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
@@ -55,7 +56,11 @@ impl AdState {
 /// Run the AD indicator. Returns `[outputs, state]` as a JS array.
 /// `inputs`: `[[high], [low], [close], [volume]]`
 #[wasm_bindgen(js_name = "adIndicator")]
-pub fn ad_indicator(inputs: JsValue, options: Vec<f64>, optional_outputs: JsValue) -> Result<js_sys::Array, JsError> {
+pub fn ad_indicator(
+    inputs: JsValue,
+    options: Vec<f64>,
+    optional_outputs: JsValue,
+) -> Result<js_sys::Array, JsError> {
     let inputs = inputs_from_js(inputs)?;
     let input_arr: [&[f64]; IW] = inputs
         .iter()
@@ -67,7 +72,7 @@ pub fn ad_indicator(inputs: JsValue, options: Vec<f64>, optional_outputs: JsValu
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_ad::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = Ad::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(outputs_to_js(outputs)?, JsValue::from(AdState { inner }))
 }
@@ -75,12 +80,14 @@ pub fn ad_indicator(inputs: JsValue, options: Vec<f64>, optional_outputs: JsValu
 /// Static metadata for AD.
 #[wasm_bindgen(js_name = "adInfo")]
 pub fn ad_info() -> JsValue {
-    info_to_object(rust_ad::INFO)
+    info_to_object(Ad::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "adMinData")]
 pub fn ad_min_data(options: Vec<f64>) -> u32 {
-    rust_ad::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    Ad::min_data(&option_arr) as u32
 }
-

@@ -1,16 +1,16 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
-use tulip_rs::indicators::qstick as rust_qstick;
+use tulip_rs::indicators::qstick::{Indicator, IndicatorState, QStick, INPUTS, OPTIONS};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_qstick::INPUTS_WIDTH;
-const OW: usize = rust_qstick::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct QstickState {
-    inner: rust_qstick::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
@@ -44,7 +44,7 @@ impl QstickState {
 
     #[wasm_bindgen(js_name = "fromJson")]
     pub fn from_json(json: String) -> Result<QstickState, JsError> {
-        serde_json::from_str::<rust_qstick::IndicatorState>(&json)
+        serde_json::from_str::<IndicatorState>(&json)
             .map(|inner| QstickState { inner })
             .map_err(|e| JsError::new(&e.to_string()))
     }
@@ -71,7 +71,7 @@ pub fn qstick_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_qstick::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = QStick::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(
         outputs_to_js(outputs)?,
@@ -82,12 +82,14 @@ pub fn qstick_indicator(
 /// Static metadata for QSTICK.
 #[wasm_bindgen(js_name = "qstickInfo")]
 pub fn qstick_info() -> JsValue {
-    info_to_object(rust_qstick::INFO)
+    info_to_object(QStick::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "qstickMinData")]
 pub fn qstick_min_data(options: Vec<f64>) -> u32 {
-    rust_qstick::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    QStick::min_data(&option_arr) as u32
 }
-

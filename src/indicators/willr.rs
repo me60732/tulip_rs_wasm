@@ -1,21 +1,21 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
 use tulip_rs::indicators::willr as rust_willr;
+use tulip_rs::indicators::willr::{Indicator, IndicatorState, Willr, INPUTS, OPTIONS};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_willr::INPUTS_WIDTH;
-const OW: usize = rust_willr::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct WillrState {
-    inner: rust_willr::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
 impl WillrState {
-    /// Continue streaming: feed new bars into an existing state.
     #[wasm_bindgen(js_name = "batchIndicator")]
     pub fn batch_indicator(
         &mut self,
@@ -52,8 +52,6 @@ impl WillrState {
 
 // ── Top-level functions ───────────────────────────────────────────────────────
 
-/// Run the WILLR indicator. Returns `[outputs, state]` as a JS array.
-/// `inputs`: `[[high, low, close]]`   `options`: `[period]`
 #[wasm_bindgen(js_name = "willrIndicator")]
 pub fn willr_indicator(
     inputs: JsValue,
@@ -71,20 +69,20 @@ pub fn willr_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_willr::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = Willr::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(outputs_to_js(outputs)?, JsValue::from(WillrState { inner }))
 }
 
-/// Static metadata for WILLR.
 #[wasm_bindgen(js_name = "willrInfo")]
 pub fn willr_info() -> JsValue {
-    info_to_object(rust_willr::INFO)
+    info_to_object(Willr::INFO)
 }
 
-/// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "willrMinData")]
 pub fn willr_min_data(options: Vec<f64>) -> u32 {
-    rust_willr::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    Willr::min_data(&option_arr) as u32
 }
-

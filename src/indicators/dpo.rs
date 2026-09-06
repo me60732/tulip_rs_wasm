@@ -1,16 +1,17 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
 use tulip_rs::indicators::dpo as rust_dpo;
+use tulip_rs::indicators::dpo::{Dpo, Indicator, IndicatorState, INPUTS, OPTIONS};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_dpo::INPUTS_WIDTH;
-const OW: usize = rust_dpo::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct DpoState {
-    inner: rust_dpo::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
@@ -71,7 +72,7 @@ pub fn dpo_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_dpo::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = Dpo::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(outputs_to_js(outputs)?, JsValue::from(DpoState { inner }))
 }
@@ -79,12 +80,14 @@ pub fn dpo_indicator(
 /// Static metadata for DPO.
 #[wasm_bindgen(js_name = "dpoInfo")]
 pub fn dpo_info() -> JsValue {
-    info_to_object(rust_dpo::INFO)
+    info_to_object(Dpo::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "dpoMinData")]
 pub fn dpo_min_data(options: Vec<f64>) -> u32 {
-    rust_dpo::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    Dpo::min_data(&option_arr) as u32
 }
-

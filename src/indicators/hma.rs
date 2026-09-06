@@ -1,16 +1,17 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
 use tulip_rs::indicators::hma as rust_hma;
+use tulip_rs::indicators::hma::{Hma, Indicator, IndicatorState, INPUTS, OPTIONS};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_hma::INPUTS_WIDTH;
-const OW: usize = rust_hma::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct HmaState {
-    inner: rust_hma::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
@@ -71,7 +72,7 @@ pub fn hma_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_hma::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = Hma::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(outputs_to_js(outputs)?, JsValue::from(HmaState { inner }))
 }
@@ -79,12 +80,14 @@ pub fn hma_indicator(
 /// Static metadata for HMA.
 #[wasm_bindgen(js_name = "hmaInfo")]
 pub fn hma_info() -> JsValue {
-    info_to_object(rust_hma::INFO)
+    info_to_object(Hma::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "hmaMinData")]
 pub fn hma_min_data(options: Vec<f64>) -> u32 {
-    rust_hma::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    Hma::min_data(&option_arr) as u32
 }
-

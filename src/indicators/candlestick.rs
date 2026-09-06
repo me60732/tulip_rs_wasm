@@ -5,8 +5,8 @@ use tulip_rs::candle_indicators::types::ForecastType as RustForecastType;
 use tulip_rs::indicators::candlestick as rust_cdl;
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_cdl::INPUTS_WIDTH;
-const OW: usize = rust_cdl::OPTIONS_WIDTH;
+const IW: usize = rust_cdl::INPUTS;
+const OW: usize = rust_cdl::OPTIONS;
 
 // ── ForecastType ─────────────────────────────────────────────────────────────
 

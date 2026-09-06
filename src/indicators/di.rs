@@ -1,16 +1,17 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
 use tulip_rs::indicators::di as rust_di;
+use tulip_rs::indicators::di::{Di, Indicator, IndicatorState, INPUTS, OPTIONS};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_di::INPUTS_WIDTH;
-const OW: usize = rust_di::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct DiState {
-    inner: rust_di::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
@@ -71,7 +72,7 @@ pub fn di_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_di::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = Di::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(outputs_to_js(outputs)?, JsValue::from(DiState { inner }))
 }
@@ -79,12 +80,14 @@ pub fn di_indicator(
 /// Static metadata for DI.
 #[wasm_bindgen(js_name = "diInfo")]
 pub fn di_info() -> JsValue {
-    info_to_object(rust_di::INFO)
+    info_to_object(Di::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "diMinData")]
 pub fn di_min_data(options: Vec<f64>) -> u32 {
-    rust_di::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    Di::min_data(&option_arr) as u32
 }
-

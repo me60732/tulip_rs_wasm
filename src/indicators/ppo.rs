@@ -1,10 +1,11 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
 use tulip_rs::indicators::ppo as rust_ppo;
+use tulip_rs::indicators::ppo::{Indicator, Ppo, INPUTS, OPTIONS};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_ppo::INPUTS_WIDTH;
-const OW: usize = rust_ppo::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
@@ -71,7 +72,7 @@ pub fn ppo_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_ppo::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = Ppo::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(outputs_to_js(outputs)?, JsValue::from(PpoState { inner }))
 }
@@ -79,12 +80,14 @@ pub fn ppo_indicator(
 /// Static metadata for PPO.
 #[wasm_bindgen(js_name = "ppoInfo")]
 pub fn ppo_info() -> JsValue {
-    info_to_object(rust_ppo::INFO)
+    info_to_object(Ppo::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "ppoMinData")]
 pub fn ppo_min_data(options: Vec<f64>) -> u32 {
-    rust_ppo::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    Ppo::min_data(&option_arr) as u32
 }
-

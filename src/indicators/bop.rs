@@ -1,16 +1,17 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
 use tulip_rs::indicators::bop as rust_bop;
+use tulip_rs::indicators::bop::{Bop, Indicator, IndicatorState, INPUTS, OPTIONS};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_bop::INPUTS_WIDTH;
-const OW: usize = rust_bop::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct BopState {
-    inner: rust_bop::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
@@ -55,7 +56,11 @@ impl BopState {
 /// Run the BOP indicator. Returns `[outputs, state]` as a JS array.
 /// `inputs`: `[[open], [high], [low], [close]]`
 #[wasm_bindgen(js_name = "bopIndicator")]
-pub fn bop_indicator(inputs: JsValue, options: Vec<f64>, optional_outputs: JsValue) -> Result<js_sys::Array, JsError> {
+pub fn bop_indicator(
+    inputs: JsValue,
+    options: Vec<f64>,
+    optional_outputs: JsValue,
+) -> Result<js_sys::Array, JsError> {
     let inputs = inputs_from_js(inputs)?;
     let input_arr: [&[f64]; IW] = inputs
         .iter()
@@ -67,7 +72,7 @@ pub fn bop_indicator(inputs: JsValue, options: Vec<f64>, optional_outputs: JsVal
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_bop::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = Bop::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(outputs_to_js(outputs)?, JsValue::from(BopState { inner }))
 }
@@ -75,12 +80,14 @@ pub fn bop_indicator(inputs: JsValue, options: Vec<f64>, optional_outputs: JsVal
 /// Static metadata for BOP.
 #[wasm_bindgen(js_name = "bopInfo")]
 pub fn bop_info() -> JsValue {
-    info_to_object(rust_bop::INFO)
+    info_to_object(Bop::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "bopMinData")]
 pub fn bop_min_data(options: Vec<f64>) -> u32 {
-    rust_bop::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    Bop::min_data(&option_arr) as u32
 }
-

@@ -1,16 +1,17 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
 use tulip_rs::indicators::stoch as rust_stoch;
+use tulip_rs::indicators::stoch::{Indicator, IndicatorState, Stoch, INPUTS, OPTIONS};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_stoch::INPUTS_WIDTH;
-const OW: usize = rust_stoch::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct StochState {
-    inner: rust_stoch::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
@@ -71,7 +72,7 @@ pub fn stoch_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_stoch::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = Stoch::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(outputs_to_js(outputs)?, JsValue::from(StochState { inner }))
 }
@@ -79,12 +80,14 @@ pub fn stoch_indicator(
 /// Static metadata for STOCH.
 #[wasm_bindgen(js_name = "stochInfo")]
 pub fn stoch_info() -> JsValue {
-    info_to_object(rust_stoch::INFO)
+    info_to_object(Stoch::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "stochMinData")]
 pub fn stoch_min_data(options: Vec<f64>) -> u32 {
-    rust_stoch::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    Stoch::min_data(&option_arr) as u32
 }
-

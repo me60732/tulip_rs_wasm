@@ -1,16 +1,17 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
 use tulip_rs::indicators::adaptivemsw as rust_adaptivemsw;
+use tulip_rs::indicators::adaptivemsw::{AdaptiveMSW, Indicator, IndicatorState, INPUTS, OPTIONS};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_adaptivemsw::INPUTS_WIDTH;
-const OW: usize = rust_adaptivemsw::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct AdaptivemswState {
-    inner: rust_adaptivemsw::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
@@ -71,9 +72,8 @@ pub fn adaptivemsw_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) =
-        rust_adaptivemsw::indicator(&input_arr, &option_arr, opt_outs.as_deref())
-            .map_err(|e| JsError::new(&format!("{e:?}")))?;
+    let (outputs, inner) = AdaptiveMSW::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+        .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(
         outputs_to_js(outputs)?,
         JsValue::from(AdaptivemswState { inner }),
@@ -83,12 +83,14 @@ pub fn adaptivemsw_indicator(
 /// Static metadata for Adaptive Mesa Sine Wave.
 #[wasm_bindgen(js_name = "adaptivemswInfo")]
 pub fn adaptivemsw_info() -> JsValue {
-    info_to_object(rust_adaptivemsw::INFO)
+    info_to_object(AdaptiveMSW::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "adaptivemswMinData")]
 pub fn adaptivemsw_min_data(options: Vec<f64>) -> u32 {
-    rust_adaptivemsw::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    AdaptiveMSW::min_data(&option_arr) as u32
 }
-

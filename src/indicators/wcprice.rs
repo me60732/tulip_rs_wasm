@@ -1,20 +1,21 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
 use tulip_rs::indicators::wcprice as rust_wcprice;
+use tulip_rs::indicators::wcprice::{Indicator, IndicatorState, WcPrice, INPUTS, OPTIONS};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_wcprice::INPUTS_WIDTH;
-const OW: usize = rust_wcprice::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
-pub struct WcpriceState {
-    inner: rust_wcprice::IndicatorState,
+pub struct WcPriceState {
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
-impl WcpriceState {
+impl WcPriceState {
     /// Continue streaming: feed new bars into an existing state.
     #[wasm_bindgen(js_name = "batchIndicator")]
     pub fn batch_indicator(
@@ -43,9 +44,9 @@ impl WcpriceState {
     }
 
     #[wasm_bindgen(js_name = "fromJson")]
-    pub fn from_json(json: String) -> Result<WcpriceState, JsError> {
+    pub fn from_json(json: String) -> Result<WcPriceState, JsError> {
         serde_json::from_str::<rust_wcprice::IndicatorState>(&json)
-            .map(|inner| WcpriceState { inner })
+            .map(|inner| WcPriceState { inner })
             .map_err(|e| JsError::new(&e.to_string()))
     }
 }
@@ -71,23 +72,25 @@ pub fn wcprice_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_wcprice::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = WcPrice::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(
         outputs_to_js(outputs)?,
-        JsValue::from(WcpriceState { inner }),
+        JsValue::from(WcPriceState { inner }),
     )
 }
 
 /// Static metadata for WCPRICE.
 #[wasm_bindgen(js_name = "wcpriceInfo")]
 pub fn wcprice_info() -> JsValue {
-    info_to_object(rust_wcprice::INFO)
+    info_to_object(WcPrice::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "wcpriceMinData")]
 pub fn wcprice_min_data(options: Vec<f64>) -> u32 {
-    rust_wcprice::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    WcPrice::min_data(&option_arr) as u32
 }
-

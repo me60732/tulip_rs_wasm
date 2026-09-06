@@ -1,16 +1,16 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
-use tulip_rs::indicators::rsi as rust_rsi;
+use tulip_rs::indicators::rsi::{Indicator, IndicatorState, Rsi, INPUTS, OPTIONS};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_rsi::INPUTS_WIDTH;
-const OW: usize = rust_rsi::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct RsiState {
-    inner: rust_rsi::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
@@ -44,7 +44,7 @@ impl RsiState {
 
     #[wasm_bindgen(js_name = "fromJson")]
     pub fn from_json(json: String) -> Result<RsiState, JsError> {
-        serde_json::from_str::<rust_rsi::IndicatorState>(&json)
+        serde_json::from_str::<IndicatorState>(&json)
             .map(|inner| RsiState { inner })
             .map_err(|e| JsError::new(&e.to_string()))
     }
@@ -71,7 +71,7 @@ pub fn rsi_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_rsi::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = Rsi::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(outputs_to_js(outputs)?, JsValue::from(RsiState { inner }))
 }
@@ -79,12 +79,14 @@ pub fn rsi_indicator(
 /// Static metadata for RSI.
 #[wasm_bindgen(js_name = "rsiInfo")]
 pub fn rsi_info() -> JsValue {
-    info_to_object(rust_rsi::INFO)
+    info_to_object(Rsi::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "rsiMinData")]
 pub fn rsi_min_data(options: Vec<f64>) -> u32 {
-    rust_rsi::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    Rsi::min_data(&option_arr) as u32
 }
-

@@ -1,16 +1,17 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
 use tulip_rs::indicators::kama as rust_kama;
+use tulip_rs::indicators::kama::{Indicator, IndicatorState, Kama, INPUTS, OPTIONS};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_kama::INPUTS_WIDTH;
-const OW: usize = rust_kama::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct KamaState {
-    inner: rust_kama::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
@@ -71,7 +72,7 @@ pub fn kama_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_kama::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = Kama::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(outputs_to_js(outputs)?, JsValue::from(KamaState { inner }))
 }
@@ -79,12 +80,14 @@ pub fn kama_indicator(
 /// Static metadata for KAMA.
 #[wasm_bindgen(js_name = "kamaInfo")]
 pub fn kama_info() -> JsValue {
-    info_to_object(rust_kama::INFO)
+    info_to_object(Kama::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "kamaMinData")]
 pub fn kama_min_data(options: Vec<f64>) -> u32 {
-    rust_kama::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    Kama::min_data(&option_arr) as u32
 }
-

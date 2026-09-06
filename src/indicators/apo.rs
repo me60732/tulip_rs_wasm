@@ -1,16 +1,17 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
 use tulip_rs::indicators::apo as rust_apo;
+use tulip_rs::indicators::apo::{Apo, Indicator, IndicatorState, INPUTS, OPTIONS};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_apo::INPUTS_WIDTH;
-const OW: usize = rust_apo::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct ApoState {
-    inner: rust_apo::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
@@ -53,7 +54,7 @@ impl ApoState {
 // ── Top-level functions ───────────────────────────────────────────────────────
 
 /// Run the APO indicator. Returns `[outputs, state]` as a JS array.
-/// `inputs`: `[[close]]`   `options`: `[fast_period, slow_period]`
+/// `inputs`: `[[close]]`   `options`: `[short_period, long_period]`
 #[wasm_bindgen(js_name = "apoIndicator")]
 pub fn apo_indicator(
     inputs: JsValue,
@@ -71,7 +72,7 @@ pub fn apo_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_apo::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = Apo::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(outputs_to_js(outputs)?, JsValue::from(ApoState { inner }))
 }
@@ -79,12 +80,14 @@ pub fn apo_indicator(
 /// Static metadata for APO.
 #[wasm_bindgen(js_name = "apoInfo")]
 pub fn apo_info() -> JsValue {
-    info_to_object(rust_apo::INFO)
+    info_to_object(Apo::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "apoMinData")]
 pub fn apo_min_data(options: Vec<f64>) -> u32 {
-    rust_apo::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    Apo::min_data(&option_arr) as u32
 }
-

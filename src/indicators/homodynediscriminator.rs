@@ -1,16 +1,19 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
 use tulip_rs::indicators::homodynediscriminator as rust_homodynediscriminator;
+use tulip_rs::indicators::homodynediscriminator::{
+    HomodyneDiscriminator, Indicator, IndicatorState, INPUTS, OPTIONS,
+};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_homodynediscriminator::INPUTS_WIDTH;
-const OW: usize = rust_homodynediscriminator::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct HomodynediscriminatorState {
-    inner: rust_homodynediscriminator::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
@@ -72,7 +75,7 @@ pub fn homodynediscriminator_indicator(
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
     let (outputs, inner) =
-        rust_homodynediscriminator::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+        HomodyneDiscriminator::indicator(&input_arr, &option_arr, opt_outs.as_deref())
             .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(
         outputs_to_js(outputs)?,
@@ -83,12 +86,14 @@ pub fn homodynediscriminator_indicator(
 /// Static metadata for Homodyne Discriminator.
 #[wasm_bindgen(js_name = "homodynediscriminatorInfo")]
 pub fn homodynediscriminator_info() -> JsValue {
-    info_to_object(rust_homodynediscriminator::INFO)
+    info_to_object(HomodyneDiscriminator::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "homodynediscriminatorMinData")]
 pub fn homodynediscriminator_min_data(options: Vec<f64>) -> u32 {
-    rust_homodynediscriminator::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    HomodyneDiscriminator::min_data(&option_arr) as u32
 }
-

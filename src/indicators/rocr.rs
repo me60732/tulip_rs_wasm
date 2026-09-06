@@ -1,16 +1,16 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
-use tulip_rs::indicators::rocr as rust_rocr;
+use tulip_rs::indicators::rocr::{Indicator, IndicatorState, Rocr, INPUTS, OPTIONS};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_rocr::INPUTS_WIDTH;
-const OW: usize = rust_rocr::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct RocrState {
-    inner: rust_rocr::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
@@ -44,7 +44,7 @@ impl RocrState {
 
     #[wasm_bindgen(js_name = "fromJson")]
     pub fn from_json(json: String) -> Result<RocrState, JsError> {
-        serde_json::from_str::<rust_rocr::IndicatorState>(&json)
+        serde_json::from_str::<IndicatorState>(&json)
             .map(|inner| RocrState { inner })
             .map_err(|e| JsError::new(&e.to_string()))
     }
@@ -71,7 +71,7 @@ pub fn rocr_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_rocr::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = Rocr::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(outputs_to_js(outputs)?, JsValue::from(RocrState { inner }))
 }
@@ -79,12 +79,14 @@ pub fn rocr_indicator(
 /// Static metadata for ROCR.
 #[wasm_bindgen(js_name = "rocrInfo")]
 pub fn rocr_info() -> JsValue {
-    info_to_object(rust_rocr::INFO)
+    info_to_object(Rocr::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "rocrMinData")]
 pub fn rocr_min_data(options: Vec<f64>) -> u32 {
-    rust_rocr::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    Rocr::min_data(&option_arr) as u32
 }
-

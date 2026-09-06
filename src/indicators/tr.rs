@@ -1,16 +1,17 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
 use tulip_rs::indicators::tr as rust_tr;
+use tulip_rs::indicators::tr::{Indicator, IndicatorState, Tr, INPUTS, OPTIONS};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_tr::INPUTS_WIDTH;
-const OW: usize = rust_tr::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct TrState {
-    inner: rust_tr::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
@@ -53,9 +54,13 @@ impl TrState {
 // ── Top-level functions ───────────────────────────────────────────────────────
 
 /// Run the TR indicator. Returns `[outputs, state]` as a JS array.
-/// `inputs`: `[[high, low, close]]`   `options`: `[]`
+/// `inputs`: `[[high], [low], [close]]`   `options`: `[]`
 #[wasm_bindgen(js_name = "trIndicator")]
-pub fn tr_indicator(inputs: JsValue, options: Vec<f64>, optional_outputs: JsValue) -> Result<js_sys::Array, JsError> {
+pub fn tr_indicator(
+    inputs: JsValue,
+    options: Vec<f64>,
+    optional_outputs: JsValue,
+) -> Result<js_sys::Array, JsError> {
     let inputs = inputs_from_js(inputs)?;
     let input_arr: [&[f64]; IW] = inputs
         .iter()
@@ -65,9 +70,9 @@ pub fn tr_indicator(inputs: JsValue, options: Vec<f64>, optional_outputs: JsValu
         .map_err(|_| JsError::new(&format!("Expected {IW} input series")))?;
     let option_arr: [f64; OW] = options
         .try_into()
-        .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_tr::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = Tr::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(outputs_to_js(outputs)?, JsValue::from(TrState { inner }))
 }
@@ -75,12 +80,14 @@ pub fn tr_indicator(inputs: JsValue, options: Vec<f64>, optional_outputs: JsValu
 /// Static metadata for TR.
 #[wasm_bindgen(js_name = "trInfo")]
 pub fn tr_info() -> JsValue {
-    info_to_object(rust_tr::INFO)
+    info_to_object(Tr::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "trMinData")]
 pub fn tr_min_data(options: Vec<f64>) -> u32 {
-    rust_tr::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    Tr::min_data(&option_arr) as u32
 }
-

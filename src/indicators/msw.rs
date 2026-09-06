@@ -1,10 +1,10 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
-use tulip_rs::indicator_types::TIndicatorState as _;
+use tulip_rs::indicator_types::{Indicator, TIndicatorState as _};
 use tulip_rs::indicators::msw as rust_msw;
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_msw::INPUTS_WIDTH;
-const OW: usize = rust_msw::OPTIONS_WIDTH;
+const IW: usize = rust_msw::INPUTS;
+const OW: usize = rust_msw::OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
@@ -71,7 +71,7 @@ pub fn msw_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_msw::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = rust_msw::Msw::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(outputs_to_js(outputs)?, JsValue::from(MswState { inner }))
 }
@@ -79,12 +79,15 @@ pub fn msw_indicator(
 /// Static metadata for MSW.
 #[wasm_bindgen(js_name = "mswInfo")]
 pub fn msw_info() -> JsValue {
-    info_to_object(rust_msw::INFO)
+    info_to_object(rust_msw::Msw::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "mswMinData")]
 pub fn msw_min_data(options: Vec<f64>) -> u32 {
-    rust_msw::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .map_err(|_| JsError::new(&format!("Expected {OW} options")))
+        .unwrap_or([0.0; OW]);
+    rust_msw::Msw::min_data(&option_arr) as u32
 }
-

@@ -1,10 +1,10 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
-use tulip_rs::indicator_types::TIndicatorState as _;
+use tulip_rs::indicator_types::{Indicator, TIndicatorState as _};
 use tulip_rs::indicators::mom as rust_mom;
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_mom::INPUTS_WIDTH;
-const OW: usize = rust_mom::OPTIONS_WIDTH;
+const IW: usize = rust_mom::INPUTS;
+const OW: usize = rust_mom::OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
@@ -71,7 +71,7 @@ pub fn mom_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_mom::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = rust_mom::Mom::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(outputs_to_js(outputs)?, JsValue::from(MomState { inner }))
 }
@@ -79,12 +79,15 @@ pub fn mom_indicator(
 /// Static metadata for MOM.
 #[wasm_bindgen(js_name = "momInfo")]
 pub fn mom_info() -> JsValue {
-    info_to_object(rust_mom::INFO)
+    info_to_object(rust_mom::Mom::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "momMinData")]
 pub fn mom_min_data(options: Vec<f64>) -> u32 {
-    rust_mom::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .map_err(|_| JsError::new(&format!("Expected {OW} options")))
+        .unwrap_or([0.0; OW]);
+    rust_mom::Mom::min_data(&option_arr) as u32
 }
-

@@ -1,16 +1,17 @@
 use crate::utils::{info_to_object, inputs_from_js, make_pair, outputs_to_js};
 use tulip_rs::indicator_types::TIndicatorState as _;
 use tulip_rs::indicators::mama as rust_mama;
+use tulip_rs::indicators::mama::{Indicator, IndicatorState, Mama, INPUTS, OPTIONS};
 use wasm_bindgen::prelude::*;
 
-const IW: usize = rust_mama::INPUTS_WIDTH;
-const OW: usize = rust_mama::OPTIONS_WIDTH;
+const IW: usize = INPUTS;
+const OW: usize = OPTIONS;
 
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
 pub struct MamaState {
-    inner: rust_mama::IndicatorState,
+    inner: IndicatorState,
 }
 
 #[wasm_bindgen]
@@ -53,7 +54,7 @@ impl MamaState {
 // ── Top-level functions ───────────────────────────────────────────────────────
 
 /// Run the MESA Adaptive Moving Average indicator. Returns `[outputs, state]` as a JS array.
-/// `inputs`: `[[real]]` | `options`: `[fast_limit, slow_limit]`
+/// `inputs`: `[[real]]` | `options`: `{fast_limit, slow_limit}`
 /// Mandatory outputs: `mama`, `fama` | Optional: `[want_dc_period, want_alpha]`
 #[wasm_bindgen(js_name = "mamaIndicator")]
 pub fn mama_indicator(
@@ -72,7 +73,7 @@ pub fn mama_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let opt_outs = crate::utils::optional_outputs_from_js(optional_outputs)?;
-    let (outputs, inner) = rust_mama::indicator(&input_arr, &option_arr, opt_outs.as_deref())
+    let (outputs, inner) = Mama::indicator(&input_arr, &option_arr, opt_outs.as_deref())
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(outputs_to_js(outputs)?, JsValue::from(MamaState { inner }))
 }
@@ -80,12 +81,14 @@ pub fn mama_indicator(
 /// Static metadata for MAMA / FAMA.
 #[wasm_bindgen(js_name = "mamaInfo")]
 pub fn mama_info() -> JsValue {
-    info_to_object(rust_mama::INFO)
+    info_to_object(Mama::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "mamaMinData")]
 pub fn mama_min_data(options: Vec<f64>) -> u32 {
-    rust_mama::min_data(&options) as u32
+    let option_arr: [f64; OW] = options
+        .try_into()
+        .unwrap_or_else(|_| panic!("Expected {OW} options"));
+    Mama::min_data(&option_arr) as u32
 }
-

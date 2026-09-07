@@ -33,6 +33,14 @@ jobs:
       - name: Build WASM (web target)
         run: wasm-pack build --target web --out-dir pkg
 
+      - name: Remove wasm-pack's auto-generated pkg/.gitignore
+        # wasm-pack writes a `pkg/.gitignore` containing just `*`. npm's packer
+        # honors nested .gitignore files even when package.json's `files` field
+        # allowlists specific paths inside that directory, which silently drops
+        # the entire pkg/ folder from the published tarball. Remove it so the
+        # wasm binary and JS glue actually get published.
+        run: rm -f pkg/.gitignore
+
       - name: Install npm dependencies
         run: npm ci
 

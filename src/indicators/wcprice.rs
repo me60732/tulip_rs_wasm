@@ -10,12 +10,12 @@ const OW: usize = OPTIONS;
 // ── State class ──────────────────────────────────────────────────────────────
 
 #[wasm_bindgen]
-pub struct WcPriceState {
+pub struct WcpriceState {
     inner: IndicatorState,
 }
 
 #[wasm_bindgen]
-impl WcPriceState {
+impl WcpriceState {
     /// Continue streaming: feed new bars into an existing state.
     #[wasm_bindgen(js_name = "batchIndicator")]
     pub fn batch_indicator(
@@ -44,9 +44,9 @@ impl WcPriceState {
     }
 
     #[wasm_bindgen(js_name = "fromJson")]
-    pub fn from_json(json: String) -> Result<WcPriceState, JsError> {
+    pub fn from_json(json: String) -> Result<WcpriceState, JsError> {
         serde_json::from_str::<rust_wcprice::IndicatorState>(&json)
-            .map(|inner| WcPriceState { inner })
+            .map(|inner| WcpriceState { inner })
             .map_err(|e| JsError::new(&e.to_string()))
     }
 }
@@ -76,7 +76,7 @@ pub fn wcprice_indicator(
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     make_pair(
         outputs_to_js(outputs)?,
-        JsValue::from(WcPriceState { inner }),
+        JsValue::from(WcpriceState { inner }),
     )
 }
 

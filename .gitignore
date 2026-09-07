@@ -1,6 +1,7 @@
 /target/
 /pkg/
 /node_modules/
+.npm-cache/
 *.md
 !README.md
 run_examples.mjs

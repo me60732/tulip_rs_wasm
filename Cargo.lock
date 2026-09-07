@@ -276,8 +276,8 @@ dependencies = [
 
 [[package]]
 name = "tulip_rs"
-version = "0.2.3"
-source = "git+https://github.com/me60732/tulip_rs.git?tag=v0.2.3#7efbf188a794001fa7d6dc33274315e3d52427e3"
+version = "0.2.5"
+source = "git+https://github.com/me60732/tulip_rs.git?tag=v0.2.5#ec731f8b76cbf58d51e2a078be67b609ac91f1ef"
 dependencies = [
  "serde",
  "serde_json",
@@ -288,7 +288,7 @@ dependencies = [
 [[package]]
 name = "tulip_rs_macros"
 version = "0.1.0"
-source = "git+https://github.com/me60732/tulip_rs.git?tag=v0.2.3#7efbf188a794001fa7d6dc33274315e3d52427e3"
+source = "git+https://github.com/me60732/tulip_rs.git?tag=v0.2.5#ec731f8b76cbf58d51e2a078be67b609ac91f1ef"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -299,11 +299,11 @@ dependencies = [
 [[package]]
 name = "tulip_rs_shared"
 version = "0.1.0"
-source = "git+https://github.com/me60732/tulip_rs.git?tag=v0.2.3#7efbf188a794001fa7d6dc33274315e3d52427e3"
+source = "git+https://github.com/me60732/tulip_rs.git?tag=v0.2.5#ec731f8b76cbf58d51e2a078be67b609ac91f1ef"
 
 [[package]]
 name = "tulip_rs_wasm"
-version = "0.2.4"
+version = "0.2.5"
 dependencies = [
  "js-sys",
  "serde",

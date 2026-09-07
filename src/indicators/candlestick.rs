@@ -134,7 +134,7 @@ pub fn candlestick_indicator(
         .try_into()
         .map_err(|_| JsError::new(&format!("Expected {OW} options")))?;
     let forecast = forecast_type.map(|s| parse_forecast_type(&s)).transpose()?;
-    let (raw_patterns, inner) = rust_cdl::indicator(&input_arr, &option_arr, forecast)
+    let (raw_patterns, inner) = rust_cdl::CandleStick::indicator(&input_arr, &option_arr, forecast)
         .map_err(|e| JsError::new(&format!("{e:?}")))?;
     let patterns = convert_patterns(raw_patterns);
     let patterns_js =
@@ -145,12 +145,12 @@ pub fn candlestick_indicator(
 /// Static metadata for the candlestick indicator.
 #[wasm_bindgen(js_name = "candlestickInfo")]
 pub fn candlestick_info() -> JsValue {
-    info_to_object(rust_cdl::INFO)
+    info_to_object(rust_cdl::CandleStick::INFO)
 }
 
 /// Minimum number of input bars needed to produce at least one output bar.
 #[wasm_bindgen(js_name = "candlestickMinData")]
 pub fn candlestick_min_data(options: Vec<f64>) -> u32 {
-    rust_cdl::min_data(&options) as u32
+    rust_cdl::CandleStick::min_data(&options) as u32
 }
 // candlestick does not expose min_data_accuracy (not present in tulip_rs for this indicator)

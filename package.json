@@ -1,6 +1,6 @@
 {
   "name": "tulip-rs-wasm",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "WebAssembly bindings for tulip_rs — Technical Analysis Library for browsers",
   "type": "module",
   "main": "index.js",

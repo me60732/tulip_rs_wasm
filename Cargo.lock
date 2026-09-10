@@ -276,8 +276,8 @@ dependencies = [
 
 [[package]]
 name = "tulip_rs"
-version = "0.2.5"
-source = "git+https://github.com/me60732/tulip_rs.git?tag=v0.2.5#ec731f8b76cbf58d51e2a078be67b609ac91f1ef"
+version = "0.2.6"
+source = "git+https://github.com/me60732/tulip_rs.git?tag=v0.2.6#ec731f8b76cbf58d51e2a078be67b609ac91f1ef"
 dependencies = [
  "serde",
  "serde_json",
@@ -303,7 +303,7 @@ source = "git+https://github.com/me60732/tulip_rs.git?tag=v0.2.5#ec731f8b76cbf58
 
 [[package]]
 name = "tulip_rs_wasm"
-version = "0.2.5"
+version = "0.2.6"
 dependencies = [
  "js-sys",
  "serde",

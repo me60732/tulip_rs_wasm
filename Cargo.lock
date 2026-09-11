@@ -277,7 +277,8 @@ dependencies = [
 [[package]]
 name = "tulip_rs"
 version = "0.2.6"
-source = "git+https://github.com/me60732/tulip_rs.git?tag=v0.2.6#070c5fa4266ac86c2b88d0a29031ce1a62313b82"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5fe9248e768407e3e0c5ff458b842522e3468fe29763538fb01ce35a4cc02a8c"
 dependencies = [
  "serde",
  "serde_json",
@@ -288,7 +289,8 @@ dependencies = [
 [[package]]
 name = "tulip_rs_macros"
 version = "0.1.0"
-source = "git+https://github.com/me60732/tulip_rs.git?tag=v0.2.6#070c5fa4266ac86c2b88d0a29031ce1a62313b82"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4815b729552fe29d9470e93c60f7f62f42252989c7ed4d2a813277e249e6b5e0"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -299,7 +301,8 @@ dependencies = [
 [[package]]
 name = "tulip_rs_shared"
 version = "0.1.0"
-source = "git+https://github.com/me60732/tulip_rs.git?tag=v0.2.6#070c5fa4266ac86c2b88d0a29031ce1a62313b82"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5fe9a4e2c7945e507b39fd331fbe4e1f50a3526b979bdcbf8ff6582ee5ec4d5e"
 
 [[package]]
 name = "tulip_rs_wasm"

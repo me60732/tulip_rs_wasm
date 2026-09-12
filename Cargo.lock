@@ -276,9 +276,9 @@ dependencies = [
 
 [[package]]
 name = "tulip_rs"
-version = "0.2.6"
+version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5fe9248e768407e3e0c5ff458b842522e3468fe29763538fb01ce35a4cc02a8c"
+checksum = "27d9db60922c1cb5d3ed1d949f9036aae4dff1329406c2d654c0cb9c487fc099"
 dependencies = [
  "serde",
  "serde_json",
@@ -306,7 +306,7 @@ checksum = "5fe9a4e2c7945e507b39fd331fbe4e1f50a3526b979bdcbf8ff6582ee5ec4d5e"
 
 [[package]]
 name = "tulip_rs_wasm"
-version = "0.2.6"
+version = "0.2.7"
 dependencies = [
  "js-sys",
  "serde",

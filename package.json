@@ -1,11 +1,12 @@
 {
   "name": "tulip-rs-wasm",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "WebAssembly bindings for tulip_rs — Technical Analysis Library for browsers",
   "type": "module",
   "main": "index.js",
   "types": "index.d.ts",
   "license": "MIT",
+  "keywords": ["technical-analysis", "trading", "finance", "indicators", "webassembly", "wasm"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/me60732/tulip_rs_wasm.git"

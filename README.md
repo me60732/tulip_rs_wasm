@@ -18,6 +18,20 @@ build step required (CDN delivery available).
 
 Full API documentation: [me60732.github.io/tulip_rs](https://me60732.github.io/tulip_rs/)
 
+## Performance
+
+`tulip-rs-wasm` compiles the exact same SIMD-accelerated Rust core used by the
+native bindings down to a WebAssembly module — there's no reimplementation or
+JavaScript fallback, so the same performance characteristics carry into the
+browser:
+
+- Same underlying engine that is **~22× faster than Python's `ta`**, **~46×
+  faster than Node's `technicalindicators`**, and **up to 11.93× faster than
+  TA-Lib** — now running client-side with zero server round-trips
+- No native dependencies, no server compute cost, works in any modern browser
+
+📊 **[Full benchmark methodology](https://me60732.github.io/tulip_rs/benchmarks/)**
+
 ---
 
 ## Why tulip-rs-wasm?
